@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+<language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
 	<area alias="dashboardTabs">
 		<key alias="Our.Umbraco.CloudPurge">CloudPurge</key>
 	</area>
 	<area alias="cloudpurge">
 		<key alias="enablePublishingHooks">Enable Publishing hooks</key>
-		<key alias="enablePublishingHooks_Desc">Clear cache on (Un)Publish</key>
-		<key alias="enablePublishingHooks_FurtherDesc"><![CDATA[
+		<key alias="enablePublishingHooks_Desc"><![CDATA[
         <p>Clears cache from CloudFlare on Publishing/Unpublishing events.				</p>
 				]]>
 		</key>
@@ -14,5 +13,11 @@
 		<key alias="token">CloudFlare API Token</key>
 		<key alias="zoneId">CloudFlare Application ZoneId</key>
 		<key alias="purgeNow">Purge all now</key>
+
+		<key alias="alongWithDecendants">along with it's descendants</key>
+		<key alias="purged">was purged in CloudFlare.</key>
+		<key alias="contentToBePurged">CloudFlare cache will be purged for</key>
+		<key alias="purge">Purge</key>
+		<key alias="confirmPurge">Are you sure you  want to purge all now?</key>
 	</area>
 </language>

@@ -13,16 +13,18 @@
 			<div ng-show="success">
 				<div class="alert alert-success">
 					<strong>{{source.name}}</strong>
-					(<localize key="actions_alongWithDecendants" ng-if="decendants">along with it's descendants</localize>)
-					 <localize key="actions_purged">was purged in CloudFlare.</localize>
+					<span ng-if="decendants">
+						(<localize key="cloudpurge_alongWithDecendants"></localize>)
+					</span>					
+					 <localize key="cloudpurge_purged"></localize>
 				</div>
 				<button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
 			</div>
 
 			<p class="abstract" ng-hide="success">
-				<localize key="actions_contentToBePurged">CloudFlare cache will be purged for </localize>
+				<localize key="cloudpurge_contentToBePurged"></localize>
 				<strong>{{source.name}}</strong>
-				<localize key="actions_alongWithDecendants" ng-if="decendants">along with it's descendants</localize>
+				<localize key="cloudpurge_alongWithDecendants" ng-if="decendants"></localize>
 			</p>
 
 			<umb-loader ng-show="loading"></umb-loader>
@@ -44,7 +46,7 @@
 			<localize key="general_cancel">Cancel</localize>
 		</a>
 		<button class="btn btn-warning" ng-click="purgeNow()" ng-disabled="loading">
-			<localize key="actions_purge">Purge</localize>
+			<localize key="cloudpurge_purge">Purge</localize>
 		</button>
 	</div>
 </div>

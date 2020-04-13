@@ -12,11 +12,8 @@
 								checked="config.EnablePublishHooks">
 					</umb-toggle>
 					<div class="umb-toggle-group-item__content">
-						<div>
-							<localize key="CloudPurge_enablePublishingHooksDesc"></localize>
-						</div>
 						<div class="umb-toggle-group-item__description">
-							<localize key="CloudPurge_enablePublishingHooks_FurtherDesc"></localize>
+							<localize key="cloudpurge_enablePublishingHooks_Desc"></localize>
 						</div>
 					</div>
 				</div>
@@ -53,12 +50,28 @@
 			<umb-editor-footer-content-right>
 
 				<umb-button type="button"
-							action="purgeNow()"
+							action="togglePurgeNow()"
 							button-style="warning"
 							label="Purge"
 							label-key="cloudpurge_purgeNow"
 							disabled="loading">
 				</umb-button>
+
+				<div class="" ng-if="confirmPurgeNow">
+					<div class="">
+
+						<p class="abstract">
+							<localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
+						</p>
+
+						<umb-confirm caption="@cloudpurge_confirmPurge"
+									 on-confirm="purgeNow"
+									 confirm-button-style="danger"
+									 on-cancel="togglePurgeNow"></umb-confirm>
+
+					</div>
+				</div>
+
 
 				<umb-button type="button"
 							action="save()"
@@ -70,6 +83,7 @@
 				</umb-button>
 
 			</umb-editor-footer-content-right>
+
 
 		</umb-editor-footer>
 </div>

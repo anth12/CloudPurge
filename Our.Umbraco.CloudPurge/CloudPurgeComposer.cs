@@ -1,14 +1,11 @@
 ﻿using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Controllers;
 using Our.Umbraco.CloudPurge.V4;
-using System;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.Models.Sections;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
 using Umbraco.Web.Models.Trees;
@@ -22,7 +19,7 @@ namespace Our.Umbraco.CloudPurge
 	{
 		public void Compose(Composition composition)
 		{
-			composition.Register<ICloudFlareConfigFactory, CloudFlareConfigFactory>(Lifetime.Singleton);
+			composition.Register<IConfigService, ConfigService>(Lifetime.Singleton);
 			composition.Register<ICloudFlareApi, CloudFlareApi>(Lifetime.Transient);
 			composition.Register<CloudPurgeApiController>(Lifetime.Transient);
 			
@@ -43,7 +40,7 @@ namespace Our.Umbraco.CloudPurge
 
 		private void ContentTreeController_MenuRendering(TreeControllerBase sender, MenuRenderingEventArgs e)
 		{
-			CloudPurgeMenuItem.LaunchDialogView("/App_Plugins/CloudPurge/backoffice/content/purge.html", "Purge CloudFlare");
+			CloudPurgeMenuItem.LaunchDialogView("/App_Plugins/CloudPurge/action.html", "Purge CloudFlare Cache");
 			e.Menu.Items.Add(CloudPurgeMenuItem);
 		}
 	}

@@ -18,14 +18,14 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 	{
 		private class MockProvider
 		{
-			public readonly CloudFlareConfig Settings = new CloudFlareConfig(true, "mock@example.co.uk", "mock-token", "mock-zone-id");
-			public readonly Mock<ICloudFlareConfigFactory> CloudFlareConfigFactoryMock = new Mock<ICloudFlareConfigFactory>();
+			public readonly CloudPurgeConfig Config = new CloudPurgeConfig(true, "mock@example.co.uk", "mock-token", "mock-zone-id");
+			public readonly Mock<IConfigService> CloudFlareConfigFactoryMock = new Mock<IConfigService>();
 			public readonly Mock<HttpMessageHandler> HttpMessageHandlerMock = new Mock<HttpMessageHandler>();
 			public HttpClient HttpClient;
 
 			public ICloudFlareApi GetInstance()
 			{
-				CloudFlareConfigFactoryMock.Setup(f => f.GetSettings()).Returns(Settings);
+				CloudFlareConfigFactoryMock.Setup(f => f.GetConfig()).Returns(Config);
 				HttpClient = new HttpClient(HttpMessageHandlerMock.Object);
 				return new CloudFlareApi(CloudFlareConfigFactoryMock.Object, HttpClient);
 			}
@@ -161,8 +161,8 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 				.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
 					ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString() == uri &&
 													   r.Method == method &&
-													   r.Headers.GetValues("X-Auth-Key").SingleOrDefault() == mockProvider.Settings.Token &&
-													   r.Headers.GetValues("X-Auth-Email").SingleOrDefault() == mockProvider.Settings.EmailAddress &&
+													   r.Headers.GetValues("X-Auth-Key").SingleOrDefault() == mockProvider.Config.Token &&
+													   r.Headers.GetValues("X-Auth-Email").SingleOrDefault() == mockProvider.Config.EmailAddress &&
 													   verifyRequest.Invoke(JsonConvert.DeserializeObject<TRequest>(r.Content.ReadAsStringAsync().Result))
 					), ItExpr.IsAny<CancellationToken>()
 				).ReturnsAsync(new HttpResponseMessage

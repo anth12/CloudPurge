@@ -1,6 +1,7 @@
 ﻿angular.module("umbraco").controller("CloudPurge.DashboardController",
 	function ($scope, cloudPurgeService, notificationsService) {
 
+		$scope.confirmPurgeNow = false;
 		$scope.loading = true;
 
 		cloudPurgeService.getConfig().then(function (response) {
@@ -52,6 +53,10 @@
 
 				$scope.loading = false;
 			});
+		}
+
+		$scope.togglePurgeNow = function () {
+			$scope.confirmPurgeNow = !$scope.confirmPurgeNow;
 		}
 
 		$scope.togglePublishHooks = function () {

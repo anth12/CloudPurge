@@ -236,10 +236,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\CloudFlareConfig.cs" />
+    <Compile Include="Config\CloudPurgeConfig.cs" />
     <Compile Include="CloudPurgeComposer.cs" />
-    <Compile Include="Config\CloudFlareConfigFactory.cs" />
-    <Compile Include="Config\ICloudFlareConfigFactory.cs" />
+    <Compile Include="Config\ConfigService.cs" />
+    <Compile Include="Config\IConfigService.cs" />
     <Compile Include="Controllers\CloudPurgeApiController.cs" />
     <Compile Include="ICloudFlareApi.cs" />
     <Compile Include="Models\PurgeRequest.cs" />

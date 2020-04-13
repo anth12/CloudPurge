@@ -10,27 +10,27 @@ namespace Our.Umbraco.CloudPurge.Controllers
 	[PluginController("CloudPurge")]
 	public class CloudPurgeApiController : UmbracoAuthorizedApiController
 	{
-		private readonly ICloudFlareConfigFactory _configFactory;
+		private readonly IConfigService _configService;
 		private readonly ICloudFlareApi _cloudFlareApi;
 
-		public CloudPurgeApiController(ICloudFlareConfigFactory configFactory, ICloudFlareApi cloudFlareApi)
+		public CloudPurgeApiController(IConfigService configService, ICloudFlareApi cloudFlareApi)
 		{
-			_configFactory = configFactory;
+			_configService = configService;
 			_cloudFlareApi = cloudFlareApi;
 		}
 
 		[HttpGet]
-		public async Task<CloudFlareConfig> Config()
+		public CloudPurgeConfig Config()
 		{
-			var config = _configFactory.GetSettings();
+			var config = _configService.GetConfig();
 			return config;
 		}
 
 		[HttpPost]
-		public async Task<CloudFlareConfig> Config(CloudFlareConfig config)
+		public CloudPurgeConfig Config(CloudPurgeConfig config)
 		{
-			// TODO persist
-			return new CloudFlareConfig(config.EnablePublishHooks, config.EmailAddress + " (1)", config.Token, config.ZoneId);
+			_configService.WriteConfig(config);
+			return config;
 		}
 
 		[HttpGet]

@@ -356,3 +356,4 @@ cache/
 Logs/
 TEMP/
 *.sdf
+CloudPurge.config

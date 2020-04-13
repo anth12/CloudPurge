@@ -13,21 +13,21 @@ namespace Our.Umbraco.CloudPurge.V4
 {
 	internal class CloudFlareApi : ICloudFlareApi
 	{
-		private readonly ICloudFlareConfigFactory _configFactory;
+		private readonly IConfigService _configService;
 		private readonly HttpClient _httpClient;
 
 		private const string Endpoint = "https://api.cloudflare.com/client/v4";
 		private const int MaxRequestSize = 30;
 
-		public CloudFlareApi(ICloudFlareConfigFactory configFactory, HttpClient httpClient)
+		public CloudFlareApi(IConfigService configService, HttpClient httpClient)
 		{
-			_configFactory = configFactory;
+			_configService = configService;
 			_httpClient = httpClient;
 		}
 		
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
 		{
-			var config = _configFactory.GetSettings();
+			var config = _configService.GetConfig();
 
 			var batchCounter = 0;
 			var urlBatches = request.Urls.GroupBy(u => batchCounter++ / MaxRequestSize).ToArray();
@@ -88,7 +88,7 @@ namespace Our.Umbraco.CloudPurge.V4
 
 		private async Task<(TResponse, Exception)> FetchAsync<TResponse, TRequest>(Uri uri, HttpMethod method, TRequest request = default)
 		{
-			var config = _configFactory.GetSettings();
+			var config = _configService.GetConfig();
 
 			var httpRequest = new HttpRequestMessage(method, uri);
 
