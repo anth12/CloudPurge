@@ -1,0 +1,50 @@
+﻿<div ng-controller="CloudPurge.PurgeActionController">
+	<div class="umb-dialog-body form-horizontal" ng-cloak>
+		<div class="umb-pane">
+
+			<div ng-show="error">
+				<div class="alert alert-error">
+					<h5>Something went wrong</h5>
+					<div><strong>{{error.errorMsg}}</strong></div>
+					<div>{{error.data.message}}</div>
+				</div>
+			</div>
+
+			<div ng-show="success">
+				<div class="alert alert-success">
+					<strong>{{source.name}}</strong>
+					(<localize key="actions_alongWithDecendants" ng-if="decendants">along with it's descendants</localize>)
+					 <localize key="actions_purged">was purged in CloudFlare.</localize>
+				</div>
+				<button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
+			</div>
+
+			<p class="abstract" ng-hide="success">
+				<localize key="actions_contentToBePurged">CloudFlare cache will be purged for </localize>
+				<strong>{{source.name}}</strong>
+				<localize key="actions_alongWithDecendants" ng-if="decendants">along with it's descendants</localize>
+			</p>
+
+			<umb-loader ng-show="loading"></umb-loader>
+
+			<div ng-hide="success">
+
+				<umb-pane>
+					<umb-control-group localize="label" label="@defaultdialogs_includeDescendants">
+						<umb-toggle checked="$parent.$parent.decendants" on-click="$parent.$parent.toggleDecendants()"></umb-toggle>
+					</umb-control-group>
+				</umb-pane>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success">
+		<a class="btn btn-link" ng-click="closeDialog()" ng-show="!loading">
+			<localize key="general_cancel">Cancel</localize>
+		</a>
+		<button class="btn btn-warning" ng-click="purgeNow()" ng-disabled="loading">
+			<localize key="actions_purge">Purge</localize>
+		</button>
+	</div>
+</div>

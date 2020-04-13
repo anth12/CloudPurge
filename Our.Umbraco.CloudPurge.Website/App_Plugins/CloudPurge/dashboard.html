@@ -1,0 +1,75 @@
+﻿<div ng-controller="CloudPurge.DashboardController">
+
+	<umb-load-indicator ng-if="loading"></umb-load-indicator>
+
+	<umb-box ng-if="!loading">
+		<umb-box-content>
+
+			<umb-control-group label="@cloudpurge_enablePublishingHooks" class="umb-toggle-group">
+
+				<div class="umb-toggle-group-item" ng-click="togglePublishHooks()">
+					<umb-toggle class="umb-toggle-group-item__toggle"
+								checked="config.EnablePublishHooks">
+					</umb-toggle>
+					<div class="umb-toggle-group-item__content">
+						<div>
+							<localize key="CloudPurge_enablePublishingHooksDesc"></localize>
+						</div>
+						<div class="umb-toggle-group-item__description">
+							<localize key="CloudPurge_enablePublishingHooks_FurtherDesc"></localize>
+						</div>
+					</div>
+				</div>
+			</umb-control-group>
+
+			<umb-control-group label="@cloudpurge_emailAddress">
+				<input name="EmailAddress"
+					   type="text"
+					   class="input-block-level"
+					   ng-model="config.EmailAddress"
+					   required />
+			</umb-control-group>
+
+			<umb-control-group label="@cloudpurge_token">
+				<input name="Token"
+					   type="text"
+					   class="input-block-level"
+					   ng-model="config.Token"
+					   required />
+			</umb-control-group>
+
+			<umb-control-group label="@cloudpurge_zoneId">
+				<input name="ZoneId"
+					   type="text"
+					   class="input-block-level"
+					   ng-model="config.ZoneId"
+					   required />
+			</umb-control-group>
+
+		</umb-box-content>
+		
+		<umb-editor-footer>
+
+			<umb-editor-footer-content-right>
+
+				<umb-button type="button"
+							action="purgeNow()"
+							button-style="warning"
+							label="Purge"
+							label-key="cloudpurge_purgeNow"
+							disabled="loading">
+				</umb-button>
+
+				<umb-button type="button"
+							action="save()"
+							button-style="success"
+							shortcut="ctrl+s"
+							label="Save"
+							label-key="buttons_save"
+							disabled="loading">
+				</umb-button>
+
+			</umb-editor-footer-content-right>
+
+		</umb-editor-footer>
+</div>

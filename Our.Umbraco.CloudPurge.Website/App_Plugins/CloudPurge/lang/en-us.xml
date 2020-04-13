@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="en" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
+	<area alias="dashboardTabs">
+		<key alias="Our.Umbraco.CloudPurge">CloudPurge</key>
+	</area>
+	<area alias="cloudpurge">
+		<key alias="enablePublishingHooks">Enable Publishing hooks</key>
+		<key alias="enablePublishingHooks_Desc">Clear cache on (Un)Publish</key>
+		<key alias="enablePublishingHooks_FurtherDesc"><![CDATA[
+        <p>Clears cache from CloudFlare on Publishing/Unpublishing events.				</p>
+				]]>
+		</key>
+		<key alias="emailAddress">CloudFlare Email Address</key>
+		<key alias="token">CloudFlare API Token</key>
+		<key alias="zoneId">CloudFlare Application ZoneId</key>
+		<key alias="purgeNow">Purge all now</key>
+	</area>
+</language>
