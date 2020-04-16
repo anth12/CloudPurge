@@ -2,6 +2,7 @@
 using Our.Umbraco.CloudPurge.Models;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Our.Umbraco.CloudPurge.Cdn;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -11,12 +12,12 @@ namespace Our.Umbraco.CloudPurge.Controllers
 	public class CloudPurgeApiController : UmbracoAuthorizedApiController
 	{
 		private readonly IConfigService _configService;
-		private readonly ICloudFlareApi _cloudFlareApi;
+		private readonly ICdnApi _cdnApi;
 
-		public CloudPurgeApiController(IConfigService configService, ICloudFlareApi cloudFlareApi)
+		public CloudPurgeApiController(IConfigService configService, ICdnApi cdnApi)
 		{
 			_configService = configService;
-			_cloudFlareApi = cloudFlareApi;
+			_cdnApi = cdnApi;
 		}
 
 		[HttpGet]
@@ -34,18 +35,18 @@ namespace Our.Umbraco.CloudPurge.Controllers
 		}
 
 		[HttpGet]
-		public async Task<bool> PurgeAll()
+		public async Task<PurgeResponse> PurgeAll()
 		{
 			var request = new PurgeRequest(null, true);
-			var result = await _cloudFlareApi.PurgeAsync(request);
-			return true;
+			var result = await _cdnApi.PurgeAsync(request);
+			return result;
 		}
 
 		[HttpGet]
 		public async Task<bool> Purge(int id, bool descendants = false)
 		{
 			//var request = new PurgeRequest(null, true);
-			//var result = await _cloudFlareApi.PurgeAsync(request);
+			//var result = await _cdnApi.PurgeAsync(request);
 			return true;
 		}
 	}

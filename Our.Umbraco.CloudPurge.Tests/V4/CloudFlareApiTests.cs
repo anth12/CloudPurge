@@ -10,6 +10,8 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Our.Umbraco.CloudPurge.Cdn;
+using Our.Umbraco.CloudPurge.CDN.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
 
 namespace Our.Umbraco.CloudPurge.Tests.V4
@@ -18,16 +20,16 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 	{
 		private class MockProvider
 		{
-			public readonly CloudPurgeConfig Config = new CloudPurgeConfig(true, "mock@example.co.uk", "mock-token", "mock-zone-id");
+			public readonly CloudPurgeConfig Config = new CloudPurgeConfig(true, null, new CloudFlareConfig("mock@example.co.uk", "mock-token", "mock-zone-id"));
 			public readonly Mock<IConfigService> CloudFlareConfigFactoryMock = new Mock<IConfigService>();
 			public readonly Mock<HttpMessageHandler> HttpMessageHandlerMock = new Mock<HttpMessageHandler>();
 			public HttpClient HttpClient;
 
-			public ICloudFlareApi GetInstance()
+			public ICdnApi GetInstance()
 			{
 				CloudFlareConfigFactoryMock.Setup(f => f.GetConfig()).Returns(Config);
 				HttpClient = new HttpClient(HttpMessageHandlerMock.Object);
-				return new CloudFlareApi(CloudFlareConfigFactoryMock.Object, HttpClient);
+				return new CloudFlareV4Api(CloudFlareConfigFactoryMock.Object, HttpClient);
 			}
 		}
 
@@ -161,8 +163,8 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 				.Protected().Setup<Task<HttpResponseMessage>>("SendAsync",
 					ItExpr.Is<HttpRequestMessage>(r => r.RequestUri.ToString() == uri &&
 													   r.Method == method &&
-													   r.Headers.GetValues("X-Auth-Key").SingleOrDefault() == mockProvider.Config.Token &&
-													   r.Headers.GetValues("X-Auth-Email").SingleOrDefault() == mockProvider.Config.EmailAddress &&
+													   r.Headers.GetValues("X-Auth-Key").SingleOrDefault() == mockProvider.Config.CloudFlare.Token &&
+													   r.Headers.GetValues("X-Auth-Email").SingleOrDefault() == mockProvider.Config.CloudFlare.EmailAddress &&
 													   verifyRequest.Invoke(JsonConvert.DeserializeObject<TRequest>(r.Content.ReadAsStringAsync().Result))
 					), ItExpr.IsAny<CancellationToken>()
 				).ReturnsAsync(new HttpResponseMessage

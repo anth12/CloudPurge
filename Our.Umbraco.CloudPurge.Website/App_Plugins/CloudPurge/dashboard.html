@@ -19,71 +19,86 @@
 				</div>
 			</umb-control-group>
 
-			<umb-control-group label="@cloudpurge_emailAddress">
+		</umb-box-content>
+	</umb-box>
+	<umb-box>
+		<umb-box-header title="CloudFlare" />
+		<umb-box-content>
+
+			<umb-control-group label="@cloudpurge_enable" class="umb-toggle-group">
+
+				<div class="umb-toggle-group-item" ng-click="toggleCloudFlareEnabled()">
+					<umb-toggle class="umb-toggle-group-item__toggle"
+								checked="config.CloudFlare.Enabled">
+					</umb-toggle>
+					<div class="umb-toggle-group-item__content">
+						<div class="umb-toggle-group-item__description">
+							<localize key="cloudpurge_cloudFlare_enable"></localize>
+						</div>
+					</div>
+				</div>
+			</umb-control-group>
+
+			<umb-control-group label="@cloudpurge_cloudFlare_emailAddress">
 				<input name="EmailAddress"
 					   type="text"
 					   class="input-block-level"
-					   ng-model="config.EmailAddress"
+					   ng-model="config.CloudFlare.EmailAddress"
+					   ng-disabled="!config.CloudFlare.Enabled"
 					   required />
 			</umb-control-group>
 
-			<umb-control-group label="@cloudpurge_token">
+			<umb-control-group label="@cloudpurge_cloudFlare_token">
 				<input name="Token"
 					   type="text"
 					   class="input-block-level"
-					   ng-model="config.Token"
+					   ng-model="config.CloudFlare.Token"
+					   ng-disabled="!config.CloudFlare.Enabled"
 					   required />
 			</umb-control-group>
 
-			<umb-control-group label="@cloudpurge_zoneId">
+			<umb-control-group label="@cloudpurge_cloudFlare_zoneId">
 				<input name="ZoneId"
 					   type="text"
 					   class="input-block-level"
-					   ng-model="config.ZoneId"
+					   ng-model="config.CloudFlare.ZoneId"
+					   ng-disabled="!config.CloudFlare.Enabled"
 					   required />
 			</umb-control-group>
 
 		</umb-box-content>
-		
-		<umb-editor-footer>
+	</umb-box>
 
-			<umb-editor-footer-content-right>
+	<umb-editor-footer>
 
-				<umb-button type="button"
-							action="togglePurgeNow()"
-							button-style="warning"
-							label="Purge"
-							label-key="cloudpurge_purgeNow"
-							disabled="loading">
-				</umb-button>
+		<umb-editor-footer-content-right>
 
-				<div class="" ng-if="confirmPurgeNow">
-					<div class="">
+			<umb-confirm caption="Purge all now?"
+						 ng-if="confirmPurgeNow"
+						 on-confirm="purgeNow"
+						 confirm-button-style="danger"
+						 on-cancel="togglePurgeNow"></umb-confirm>
 
-						<p class="abstract">
-							<localize key="defaultdialogs_confirmdelete">Are you sure you want to delete</localize> <strong>{{currentNode.name}}</strong>?
-						</p>
+			<umb-button type="button"
+						action="togglePurgeNow()"
+						button-style="warning"
+						label="Purge"
+						label-key="cloudpurge_purgeNow"
+						disabled="loading">
+			</umb-button>
 
-						<umb-confirm caption="@cloudpurge_confirmPurge"
-									 on-confirm="purgeNow"
-									 confirm-button-style="danger"
-									 on-cancel="togglePurgeNow"></umb-confirm>
+			<umb-button type="button"
+						action="save()"
+						button-style="success"
+						shortcut="ctrl+s"
+						label="Save"
+						label-key="buttons_save"
+						disabled="loading">
+			</umb-button>
 
-					</div>
-				</div>
-
-
-				<umb-button type="button"
-							action="save()"
-							button-style="success"
-							shortcut="ctrl+s"
-							label="Save"
-							label-key="buttons_save"
-							disabled="loading">
-				</umb-button>
-
-			</umb-editor-footer-content-right>
+		</umb-editor-footer-content-right>
 
 
-		</umb-editor-footer>
+	</umb-editor-footer>
+
 </div>

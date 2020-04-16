@@ -63,6 +63,9 @@
 			$scope.config.EnablePublishHooks = !$scope.config.EnablePublishHooks;
 		}
 
+		$scope.toggleCloudFlareEnabled = function () {
+			$scope.config.CloudFlare.Enabled = !$scope.config.CloudFlare.Enabled;
+		}
 		// #endregion
 	});
 

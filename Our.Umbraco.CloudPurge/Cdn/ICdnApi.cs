@@ -2,11 +2,12 @@
 using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Models;
 
-namespace Our.Umbraco.CloudPurge
+namespace Our.Umbraco.CloudPurge.Cdn
 {
-	public interface ICloudFlareApi : IDisposable
+	public interface ICdnApi : IDisposable
 	{
-		Task<bool> ZoneDetailsAsync(string zoneId);
+		bool IsEnabled();
+		Task<bool> HealthCheckAsync();
 		Task<PurgeResponse> PurgeAsync(PurgeRequest request);
 	}
 }

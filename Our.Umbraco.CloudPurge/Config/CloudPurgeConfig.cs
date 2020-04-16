@@ -1,35 +1,30 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Our.Umbraco.CloudPurge
+namespace Our.Umbraco.CloudPurge.Config
 {
 	[DataContract]
 	public class CloudPurgeConfig
 	{
-		public CloudPurgeConfig() {}
+		public CloudPurgeConfig()
+		{
+			CloudFlare = new CloudFlareConfig("", "", "");
+		}
 
-		public CloudPurgeConfig(bool enablePublishHooks, string emailAddress, string token, string zoneId)
+		public CloudPurgeConfig(bool enablePublishHooks, ContentFilterConfig contentFilter, CloudFlareConfig cloudFlare)
 		{
 			EnablePublishHooks = enablePublishHooks;
-			EmailAddress = emailAddress;
-			Token = token;
-			ZoneId = zoneId;
+			ContentFilter = contentFilter;
+			CloudFlare = cloudFlare;
 		}
 
 		[DataMember]
 		public bool EnablePublishHooks { get; set; }
 
 		[DataMember]
-		public string EmailAddress { get; set; }
+		public ContentFilterConfig ContentFilter { get; set; }
 
 		[DataMember]
-		public string Token { get; set; }
-
-		[DataMember]
-		public string ZoneId { get; set; }
-
-		public bool IsValid()
-			=> !string.IsNullOrEmpty(EmailAddress) &&
-			!string.IsNullOrEmpty(Token) &&
-			!string.IsNullOrEmpty(ZoneId);
+		public CloudFlareConfig CloudFlare { get; set; }
+		
 	}
 }

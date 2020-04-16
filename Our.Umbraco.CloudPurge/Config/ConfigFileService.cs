@@ -6,12 +6,12 @@ using Umbraco.Core.Logging;
 
 namespace Our.Umbraco.CloudPurge.Config
 {
-	internal class ConfigService : IConfigService
+	internal class ConfigFileService : IConfigService
 	{
 		private readonly ILogger _logger;
 		private readonly string _configFilePath;
 
-		public ConfigService(ILogger logger)
+		public ConfigFileService(ILogger logger)
 		{
 			_logger = logger;
 			_configFilePath = IOHelper.MapPath($"{SystemDirectories.Config}/CloudPurge.config");
@@ -30,7 +30,9 @@ namespace Our.Umbraco.CloudPurge.Config
 					return _config;
 
 				return _config = ReadConfigFromFile()
-					?? new CloudPurgeConfig(false, "", "", "");
+					?? new CloudPurgeConfig(false,
+						new ContentFilterConfig(Array.Empty<string>(), Array.Empty<string>()),
+						new CloudFlareConfig("", "", ""));
 			}
 		}
 
@@ -67,7 +69,7 @@ namespace Our.Umbraco.CloudPurge.Config
 			}
 			catch (Exception ex)
 			{
-				_logger.Error<ConfigService>("Error reading CloudPurge config file", ex);
+				_logger.Error<ConfigFileService>("Error reading CloudPurge config file", ex);
 				return null;
 			}
 		}

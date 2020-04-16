@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
+using Our.Umbraco.CloudPurge.V4;
 
-namespace Our.Umbraco.CloudPurge.V4
+namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {
 	[ExcludeFromCodeCoverage]
 	internal class CloudFlareResponse<TResult>

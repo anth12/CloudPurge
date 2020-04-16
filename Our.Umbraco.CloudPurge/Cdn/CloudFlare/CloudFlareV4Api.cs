@@ -5,13 +5,15 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using Our.Umbraco.CloudPurge.Models;
 using Newtonsoft.Json;
+using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Config;
+using Our.Umbraco.CloudPurge.Models;
+using Our.Umbraco.CloudPurge.V4;
 
-namespace Our.Umbraco.CloudPurge.V4
+namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {
-	internal class CloudFlareApi : ICloudFlareApi
+	internal class CloudFlareV4Api : ICdnApi
 	{
 		private readonly IConfigService _configService;
 		private readonly HttpClient _httpClient;
@@ -19,12 +21,15 @@ namespace Our.Umbraco.CloudPurge.V4
 		private const string Endpoint = "https://api.cloudflare.com/client/v4";
 		private const int MaxRequestSize = 30;
 
-		public CloudFlareApi(IConfigService configService, HttpClient httpClient)
+		public CloudFlareV4Api(IConfigService configService, HttpClient httpClient)
 		{
 			_configService = configService;
 			_httpClient = httpClient;
 		}
-		
+
+		public bool IsEnabled()
+			=> _configService.GetConfig().CloudFlare.Enabled;
+
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
 		{
 			var config = _configService.GetConfig();
@@ -36,7 +41,7 @@ namespace Our.Umbraco.CloudPurge.V4
 			{
 				var apiRequest = new PurgeCacheRequest(urls, request.Everything);
 
-				var uri = new Uri($"{Endpoint}/zones/{config.ZoneId}/purge_cache");
+				var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
 				return FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeCacheRequest>(uri, HttpMethod.Post, apiRequest);
 			});
 
@@ -74,10 +79,11 @@ namespace Our.Umbraco.CloudPurge.V4
 			);
 		}
 
-		public async Task<bool> ZoneDetailsAsync(string zoneId)
+		public async Task<bool> HealthCheckAsync()
 		{
+			var config = _configService.GetConfig();
 
-			var uri = new Uri($"{Endpoint}/zones/{zoneId}");
+			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}");
 			var (result, exception) = await FetchAsync<CloudFlareResponse<ZoneDetailsResult>, PurgeCacheRequest>(uri, HttpMethod.Get);
 
 			if (exception != null)
@@ -98,8 +104,8 @@ namespace Our.Umbraco.CloudPurge.V4
 				httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 			}
 
-			httpRequest.Headers.Add("X-Auth-Key", config.Token);
-			httpRequest.Headers.Add("X-Auth-Email", config.EmailAddress);
+			httpRequest.Headers.Add("X-Auth-Key", config.CloudFlare.Token);
+			httpRequest.Headers.Add("X-Auth-Email", config.CloudFlare.EmailAddress);
 
 			var httpResponse = await _httpClient.SendAsync(httpRequest);
 
