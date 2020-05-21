@@ -10,11 +10,13 @@ using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
+using Serilog;
 
 namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {
 	internal class CloudFlareV4Api : ICdnApi
 	{
+		private readonly ILogger _logger;
 		private readonly IConfigService _configService;
 		private readonly HttpClient _httpClient;
 
@@ -23,6 +25,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 
 		public CloudFlareV4Api(IConfigService configService, HttpClient httpClient)
 		{
+			_logger = Log.ForContext<CloudFlareV4Api>();
 			_configService = configService;
 			_httpClient = httpClient;
 		}
@@ -30,7 +33,30 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 		public bool IsEnabled()
 			=> _configService.GetConfig().CloudFlare.Enabled;
 
-		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
+		public Task<PurgeResponse> PurgeAsync(PurgeRequest request)
+		{
+			return request.Everything 
+				? PurgeEverythingAsync() 
+				: PurgeUrlsAsync(request);
+		}
+
+		private async Task<PurgeResponse> PurgeEverythingAsync()
+		{
+			var config = _configService.GetConfig();
+
+			var apiRequest = new PurgeAllCacheRequest(true);
+
+			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
+			var (result, error) = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeAllCacheRequest>(uri, HttpMethod.Post, apiRequest);
+
+			return new PurgeResponse(
+				success: result?.Success ?? false,
+				failedUrls: null,
+				failMessages: result?.Messages,
+				exception: error != null ? new AggregateException(error) : null);
+		}
+
+		private async Task<PurgeResponse> PurgeUrlsAsync(PurgeRequest request)
 		{
 			var config = _configService.GetConfig();
 
@@ -39,10 +65,11 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 
 			var tasks = urlBatches.Select(urls =>
 			{
-				var apiRequest = new PurgeCacheRequest(urls, request.Everything);
+				var apiRequest = new PurgeFilesCacheRequest(urls);
 
 				var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
-				return FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeCacheRequest>(uri, HttpMethod.Post, apiRequest);
+				return FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Post,
+					apiRequest);
 			});
 
 			var responses = await Task.WhenAll(tasks);
@@ -64,7 +91,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 					failedUrls.AddRange(urlBatches[batch]);
 					failMessages.AddRange(response.Errors?.Select(e => e.Message) ?? Array.Empty<string>());
 
-					if(response.Messages?.Any() ?? false)
+					if (response.Messages?.Any() ?? false)
 						failMessages.AddRange(response.Messages);
 				}
 
@@ -84,12 +111,12 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			var config = _configService.GetConfig();
 
 			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}");
-			var (result, exception) = await FetchAsync<CloudFlareResponse<ZoneDetailsResult>, PurgeCacheRequest>(uri, HttpMethod.Get);
+			var (result, exception) = await FetchAsync<CloudFlareResponse<ZoneDetailsResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Get);
 
 			if (exception != null)
 				throw exception;
 
-			return result.Result.Paused;			
+			return !string.IsNullOrEmpty(result.Result?.Id);
 		}
 
 		private async Task<(TResponse, Exception)> FetchAsync<TResponse, TRequest>(Uri uri, HttpMethod method, TRequest request = default)
@@ -101,6 +128,8 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			if (request != null)
 			{
 				var json = JsonConvert.SerializeObject(request);
+				_logger.Verbose("Sending {RequestType} with payload {payload}", request.GetType().Name, json);
+
 				httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 			}
 
@@ -118,6 +147,8 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			}
 			catch (Exception ex)
 			{
+				_logger.Error("Error response", ex);
+
 				if (httpResponse.IsSuccessStatusCode)
 					return (default, new Exception($"Unsuccessful response code {httpResponse.StatusCode}"));
 

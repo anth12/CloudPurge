@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Services;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -30,27 +33,53 @@ namespace Our.Umbraco.CloudPurge
 		{
 			var contentIds = e.PublishedEntities.Select(c => c.Id);
 
-			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
-			{
-				var content = contentIds.Select(context.UmbracoContext.Content.GetById);
-				_contentCdnService.PurgeAsync(content);
-			}
-			
-			e.Messages.Add(new EventMessage("test", "some message", EventMessageType.Info));
-
+			PurgeCache(e.Messages, contentIds);
 		}
 
 		private void ContentService_Unpublishing(IContentService sender, PublishEventArgs<global::Umbraco.Core.Models.IContent> e)
 		{
 			var contentIds = e.PublishedEntities.Select(c => c.Id);
 
+			PurgeCache(e.Messages, contentIds);
+		}
+
+		private void PurgeCache(EventMessages messages, IEnumerable<int> contentIds)
+		{
 			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
 			{
 				var content = contentIds.Select(context.UmbracoContext.Content.GetById);
-				_contentCdnService.PurgeAsync(content);
-			}
 
-			e.Messages.Add(new EventMessage("test", "some message", EventMessageType.Info));
+				try
+				{
+					var result = Task.Run(() => _contentCdnService.PurgeAsync(content)).GetAwaiter().GetResult();
+					
+					if (result.Success)
+					{
+						messages.Add(new EventMessage("CloudPurge",
+							"Looks like it's taking a little while to clear the CDN cache...", EventMessageType.Warning));
+					}
+					else
+					{
+						messages.Add(new EventMessage("CloudPurge",
+							$"Something went wrong clearing CDN cache", EventMessageType.Warning));
+
+						foreach (var failMessage in result.FailMessages.Take(5))
+						{
+							messages.Add(new EventMessage("CloudPurge", failMessage, EventMessageType.Error));
+						}
+					}
+				}
+				catch (TimeoutException)
+				{
+					messages.Add(new EventMessage("CloudPurge",
+						"Looks like it's taking a little while to clear the CDN cache...", EventMessageType.Warning));
+				}
+				catch (Exception ex)
+				{
+					messages.Add(new EventMessage("CloudPurge",
+						"Something went wrong clearing CDN cache", EventMessageType.Error));
+				}
+			}
 		}
 
 		private void ContentService_Trashed(IContentService sender, MoveEventArgs<global::Umbraco.Core.Models.IContent> e)
@@ -58,8 +87,7 @@ namespace Our.Umbraco.CloudPurge
 			// Required? Surely it's unpublished first
 
 		}
-
-
+		
 		public void Terminate()
 		{
 			_contentCdnService.Dispose();

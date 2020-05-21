@@ -56,7 +56,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			var mockProvider = new MockProvider();
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 2,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 2,
 				HttpStatusCode.OK, "{ 'success': true }");
 
 			var request = new PurgeRequest(new[] { "mock-url-1", "mock-url-2" }, false);
@@ -82,11 +82,11 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			var mockUrlsBatch2 = Enumerable.Range(31, 10).Select(i => "mock-url-" + i);
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 30,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 30,
 				HttpStatusCode.OK, "{ 'success': true }");
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 10,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 10,
 				HttpStatusCode.OK, "{ 'success': true }");
 
 			var request = new PurgeRequest(mockUrlsBatch1.Union(mockUrlsBatch2), false);
@@ -116,11 +116,11 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			var mockUrlsBatch2 = Enumerable.Range(31, 10).Select(i => "mock-url-" + i);
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 30,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 30,
 				HttpStatusCode.OK, "{ 'success': true }");
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 10,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 10,
 				HttpStatusCode.InternalServerError, "{ 'messages': [ 'mock-message' ], 'errors': [ { 'code': 1, 'message': 'mock-error-message'} ] }");
 
 			var request = new PurgeRequest(mockUrlsBatch1.Union(mockUrlsBatch2), false);
@@ -152,7 +152,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			var mockUrlsBatch = Enumerable.Range(1, 30).Select(i => "mock-url-" + i);
 
 			MockHttpRequest(mockProvider, "https://api.cloudflare.com/client/v4/zones/mock-zone-id/purge_cache", HttpMethod.Post,
-				(PurgeCacheRequest r) => r.Files.Count() == 30,
+				(PurgeFilesCacheRequest r) => r.Files.Count() == 30,
 				responseStatusCode, "--invalid-response--");
 
 			var request = new PurgeRequest(mockUrlsBatch, false);

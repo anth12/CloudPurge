@@ -2,15 +2,19 @@
 	<div class="umb-dialog-body form-horizontal" ng-cloak>
 		<div class="umb-pane">
 
-			<div ng-show="error">
+			<div ng-if="result != null && result.success == false">
 				<div class="alert alert-error">
-					<h5>Something went wrong</h5>
-					<div><strong>{{error.errorMsg}}</strong></div>
-					<div>{{error.data.message}}</div>
+					<h3>Something went wrong</h3>
+					<div><p ng-repeat="(k, error) in result.failMessages">{{error}}</p></div>
+					
+					<h3 ng-show="result.failedUrls.length > 0">
+						<localize key="cloudpurge_notPurgedUrls"></localize>
+					</h3>
+					<ul><li ng-repeat="(k, url) in result.failedUrls">{{url}}</li></ul>
 				</div>
 			</div>
 
-			<div ng-show="success">
+			<div ng-if="result.success">
 				<div class="alert alert-success">
 					<strong>{{source.name}}</strong>
 					<span ng-if="decendants">

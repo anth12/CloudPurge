@@ -236,6 +236,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cdn\CloudFlare\PurgeAllCacheRequest.cs" />
     <Compile Include="CloudPurgeAction.cs" />
     <Compile Include="CloudPurgeComponent.cs" />
     <Compile Include="CloudPurgeDashboard.cs" />
@@ -248,13 +249,14 @@
     <Compile Include="Config\IConfigService.cs" />
     <Compile Include="Controllers\CloudPurgeApiController.cs" />
     <Compile Include="Cdn\ICdnApi.cs" />
+    <Compile Include="Extensions\TaskExtensions.cs" />
     <Compile Include="Models\PurgeRequest.cs" />
     <Compile Include="Models\PurgeResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cdn\CloudFlare\CloudFlareV4Api.cs" />
     <Compile Include="HealthCheck\CloudFlareHealthCheck.cs" />
     <Compile Include="Cdn\CloudFlare\CloudFlareResponse.cs" />
-    <Compile Include="Cdn\CloudFlare\PurgeCacheRequest.cs" />
+    <Compile Include="Cdn\CloudFlare\PurgeFilesCacheRequest.cs" />
     <Compile Include="Cdn\CloudFlare\PurgeCacheResult.cs" />
     <Compile Include="Cdn\CloudFlare\ZoneDetailsResult.cs" />
     <Compile Include="Services\ContentCdnService.cs" />

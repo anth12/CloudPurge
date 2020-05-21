@@ -5,18 +5,14 @@ using Newtonsoft.Json;
 namespace Our.Umbraco.CloudPurge.Cdn.CloudFlare
 {
 	[ExcludeFromCodeCoverage]
-	internal class PurgeCacheRequest
+	internal class PurgeFilesCacheRequest
 	{
-		public PurgeCacheRequest(IEnumerable<string> files, bool purgeEverything)
+		public PurgeFilesCacheRequest(IEnumerable<string> files)
 		{
 			Files = files;
-			PurgeEverything = purgeEverything;
 		}
 
 		[JsonProperty("files")]
 		public IEnumerable<string> Files { get; }
-
-		[JsonProperty("purge_everything")]
-		public bool PurgeEverything { get; }
 	}
 }

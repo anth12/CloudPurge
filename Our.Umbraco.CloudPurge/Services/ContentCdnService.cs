@@ -49,7 +49,8 @@ namespace Our.Umbraco.CloudPurge.Services
 
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
 		{
-			var purgeTasks = _cdnApis.Where(c => c.IsEnabled()).Select(cdn => cdn.PurgeAsync(request));
+			var purgeTasks = _cdnApis.Where(c => c.IsEnabled())
+				.Select(cdn => cdn.PurgeAsync(request));
 
 			var results = await Task.WhenAll(purgeTasks);
 

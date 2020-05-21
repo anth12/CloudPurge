@@ -3,31 +3,39 @@ using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Cdn;
 using Umbraco.Web.HealthCheck;
 
-namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
+namespace Our.Umbraco.CloudPurge.HealthCheck
 {
 	[HealthCheck("09C6BEB0-D68D-4DF6-8E0A-3E0972B2112C", "CloudPurge")]
-	internal class CloudFlareHealthCheck : HealthCheck
+	internal class CloudFlareHealthCheck : global::Umbraco.Web.HealthCheck.HealthCheck
 	{
-		private readonly ICdnApi _cdnApi;
+		private readonly IEnumerable<ICdnApi> _cdnApis;
 
-		public CloudFlareHealthCheck(ICdnApi cdnApi)
+		public CloudFlareHealthCheck(IEnumerable<ICdnApi> cdnApis)
 		{
-			_cdnApi = cdnApi;
+			_cdnApis = cdnApis;
 		}
 
 		public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
 		{
-			var result = Task.Run(() => _cdnApi.HealthCheckAsync()).Result;
+			//var result = Task.Run(() => _cdnApi.HealthCheckAsync()).Result;
 			return new HealthCheckStatus("Test execute") { ResultType = StatusResultType.Info };
 		}
 
 		public override IEnumerable<HealthCheckStatus> GetStatus()
 		{
-			var result = Task.Run(() => _cdnApi.HealthCheckAsync()).Result;
-			yield return new HealthCheckStatus("Cloud")
+			foreach (var cdnApi in _cdnApis)
 			{
-				ResultType = StatusResultType.Info
-			};
+				if (cdnApi.IsEnabled())
+				{
+					var result = Task.Run(() => cdnApi.HealthCheckAsync()).Result;
+
+					yield return new HealthCheckStatus("CloudPurge")
+					{
+						ResultType = result ? StatusResultType.Success : StatusResultType.Warning
+					};
+				}
+
+			}
 		}
 	}
 }

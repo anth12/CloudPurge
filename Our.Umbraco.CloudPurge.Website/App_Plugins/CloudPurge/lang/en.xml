@@ -23,6 +23,7 @@
 
 		<key alias="alongWithDecendants">along with it's descendants</key>
 		<key alias="purged">was purged in CDN.</key>
+		<key alias="notPurgedUrls">Url's not purged:</key>
 		<key alias="contentToBePurged">CDN cache will be purged for</key>
 		<key alias="purge">Purge</key>
 		<key alias="confirmPurge">Are you sure you  want to purge all now?</key>
