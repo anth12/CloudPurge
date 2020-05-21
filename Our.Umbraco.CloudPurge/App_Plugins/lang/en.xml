@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
+	<area alias="dashboardTabs">
+		<key alias="Our.Umbraco.CloudPurge">CloudPurge</key>
+	</area>
+	<area alias="cloudpurge">
+		<key alias="enablePublishingHooks">Enable Publishing hooks</key>
+		<key alias="enablePublishingHooks_Desc"><![CDATA[
+        <p>Clears CDN cache on Publishing/Unpublishing events.				</p>
+				]]>
+		</key>
+		<key alias="action">Purge CDN Cache</key>
+		<key alias="enable">Enabled</key>
+		<key alias="contentFilter_includedContentTypes">Included Content types</key>
+		<key alias="contentFilter_excludedContentTypes">Excluded Content types</key>
+
+		<key alias="cloudFlare_enable">Enable CloudFlare purging</key>
+		<key alias="cloudFlare_emailAddress">CloudFlare Email Address</key>
+		<key alias="cloudFlare_token">CloudFlare API Token</key>
+		<key alias="cloudFlare_zoneId">CloudFlare Application ZoneId</key>
+
+		<key alias="purgeNow">Purge all now</key>
+
+		<key alias="alongWithDecendants">along with it's descendants</key>
+		<key alias="purged">was purged in CDN.</key>
+		<key alias="notPurgedUrls">Url's not purged:</key>
+		<key alias="contentToBePurged">CDN cache will be purged for</key>
+		<key alias="purge">Purge</key>
+		<key alias="confirmPurge">Are you sure you  want to purge all now?</key>
+	</area>
+</language>

@@ -26,7 +26,9 @@ namespace Our.Umbraco.CloudPurge
 		{
 			ContentService.Published += ContentService_Published;
 			ContentService.Unpublishing += ContentService_Unpublishing;
-			ContentService.Trashed += ContentService_Trashed;
+
+			ContentService.Trashed += ContentService_Moved;
+			ContentService.Moved += ContentService_Moved;
 		}
 
 		private void ContentService_Published(IContentService sender, ContentPublishedEventArgs e)
@@ -43,6 +45,14 @@ namespace Our.Umbraco.CloudPurge
 			PurgeCache(e.Messages, contentIds);
 		}
 
+		private void ContentService_Moved(IContentService sender, MoveEventArgs<global::Umbraco.Core.Models.IContent> e)
+		{
+			var contentIds = e.MoveInfoCollection.Select(c => c.Entity.Id);
+
+			PurgeCache(e.Messages, contentIds);
+
+		}
+
 		private void PurgeCache(EventMessages messages, IEnumerable<int> contentIds)
 		{
 			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
@@ -56,7 +66,7 @@ namespace Our.Umbraco.CloudPurge
 					if (result.Success)
 					{
 						messages.Add(new EventMessage("CloudPurge",
-							"Looks like it's taking a little while to clear the CDN cache...", EventMessageType.Warning));
+							"Cleared CDN cache", EventMessageType.Success));
 					}
 					else
 					{
@@ -80,12 +90,6 @@ namespace Our.Umbraco.CloudPurge
 						"Something went wrong clearing CDN cache", EventMessageType.Error));
 				}
 			}
-		}
-
-		private void ContentService_Trashed(IContentService sender, MoveEventArgs<global::Umbraco.Core.Models.IContent> e)
-		{
-			// Required? Surely it's unpublished first
-
 		}
 		
 		public void Terminate()

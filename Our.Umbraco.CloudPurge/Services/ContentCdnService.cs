@@ -8,6 +8,7 @@ using Serilog;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
@@ -17,14 +18,16 @@ namespace Our.Umbraco.CloudPurge.Services
 		private readonly IEnumerable<ICdnApi> _cdnApis;
 		private readonly IConfigService _configService;
 		private readonly IContentTypeService _contentTypeService;
+		private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService)
+		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService, IUmbracoContextFactory umbracoContextFactory)
 		{
 			_logger = Log.ForContext<ContentCdnService>();
 
 			_cdnApis = cdnApis;
 			_configService = configService;
 			_contentTypeService = contentTypeService;
+			_umbracoContextFactory = umbracoContextFactory;
 		}
 
 		public Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content)
@@ -34,17 +37,21 @@ namespace Our.Umbraco.CloudPurge.Services
 			var publishedContent = content as IPublishedContent[] ?? content.ToArray();
 
 			var contentTypeIds = publishedContent.Select(c => c.ContentType.Id).ToHashSet().ToArray();
-			var contentTypes = _contentTypeService.GetAll(contentTypeIds).ToDictionary(c=> c.Id, c=> c);
+			var contentTypes = _contentTypeService.GetAll(contentTypeIds).ToDictionary(c => c.Id, c => c);
 
-			var filteredContent = publishedContent.Where(c => config.ContentFilter.FilterContent(contentTypes[c.ContentType.Id]));
+			var filteredContent =
+				publishedContent.Where(c => config.ContentFilter.FilterContent(contentTypes[c.ContentType.Id]));
 
-			var urls = from contentItem in filteredContent
-					   from culture in contentItem.Cultures 
-				select contentItem.Url(culture.Key, UrlMode.Absolute);
-			
-			var request = new PurgeRequest(urls, false);
+			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
+			{
+				var urls = from contentItem in filteredContent
+					from culture in contentItem.Cultures
+					select context.UmbracoContext.UrlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key);
 
-			return PurgeAsync(request);
+				var request = new PurgeRequest(urls, false);
+
+				return PurgeAsync(request);
+			}
 		}
 
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)

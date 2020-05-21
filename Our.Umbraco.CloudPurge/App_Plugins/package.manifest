@@ -1,0 +1,14 @@
+{
+  javascript:  
+  [
+    "~/App_Plugins/CloudPurge/cloudPurge.service.js",
+    "~/App_Plugins/CloudPurge/cloudPurge.controller.js"
+  ],
+  sections:
+  [ 
+    {
+      alias: "Our.Umbraco.CloudPurge",
+      name: "CloudPurge",
+    } 
+  ]
+}

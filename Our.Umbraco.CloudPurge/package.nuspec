@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+	<metadata>
+		<id>CloudPurge</id>
+		<version>0.0.1</version>
+		<title>CloudPurge for Umbraco</title>
+		<authors>Anthony Halliday</authors>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
+		<description>Clear CDN cache for Umbraco on content save</description>
+		<releaseNotes>v0.0.1    - Initial release</releaseNotes>
+		<repository type="git" url="https://github.com/anth12/CloudPurge" />
+		<dependencies>
+			 <dependency id="UmbracoCms.Core" version="8.5.5" /> 
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="App_Plugins\**\*.*" target="content\App_Plugins\CloudPurge" />
+	</files>
+</package>
