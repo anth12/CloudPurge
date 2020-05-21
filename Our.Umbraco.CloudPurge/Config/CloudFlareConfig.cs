@@ -7,8 +7,9 @@ namespace Our.Umbraco.CloudPurge.Config
 	{
 		public CloudFlareConfig() {}
 
-		public CloudFlareConfig(string emailAddress, string token, string zoneId)
+		public CloudFlareConfig(bool enabled, string emailAddress, string token, string zoneId)
 		{
+			Enabled = enabled;
 			EmailAddress = emailAddress;
 			Token = token;
 			ZoneId = zoneId;

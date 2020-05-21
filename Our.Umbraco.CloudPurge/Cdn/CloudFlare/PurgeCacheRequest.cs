@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
-namespace Our.Umbraco.CloudPurge.V4
+namespace Our.Umbraco.CloudPurge.Cdn.CloudFlare
 {
+	[ExcludeFromCodeCoverage]
 	internal class PurgeCacheRequest
 	{
 		public PurgeCacheRequest(IEnumerable<string> files, bool purgeEverything)

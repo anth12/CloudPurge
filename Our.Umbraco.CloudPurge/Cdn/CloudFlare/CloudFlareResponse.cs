@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
-using Our.Umbraco.CloudPurge.V4;
+using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 
 namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {

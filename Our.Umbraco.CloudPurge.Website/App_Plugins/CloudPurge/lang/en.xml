@@ -11,10 +11,14 @@
 		</key>
 		<key alias="action">Purge CDN Cache</key>
 		<key alias="enable">Enabled</key>
+		<key alias="contentFilter_includedContentTypes">Included Content types</key>
+		<key alias="contentFilter_excludedContentTypes">Excluded Content types</key>
+
 		<key alias="cloudFlare_enable">Enable CloudFlare purging</key>
 		<key alias="cloudFlare_emailAddress">CloudFlare Email Address</key>
 		<key alias="cloudFlare_token">CloudFlare API Token</key>
 		<key alias="cloudFlare_zoneId">CloudFlare Application ZoneId</key>
+
 		<key alias="purgeNow">Purge all now</key>
 
 		<key alias="alongWithDecendants">along with it's descendants</key>

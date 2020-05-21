@@ -1,8 +1,11 @@
-﻿using Our.Umbraco.CloudPurge.Config;
+﻿using System.Collections.Generic;
+using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
-using Our.Umbraco.CloudPurge.Cdn;
+using Our.Umbraco.CloudPurge.Services;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -12,12 +15,12 @@ namespace Our.Umbraco.CloudPurge.Controllers
 	public class CloudPurgeApiController : UmbracoAuthorizedApiController
 	{
 		private readonly IConfigService _configService;
-		private readonly ICdnApi _cdnApi;
+		private readonly IContentCdnService _cdnService;
 
-		public CloudPurgeApiController(IConfigService configService, ICdnApi cdnApi)
+		public CloudPurgeApiController(IConfigService configService, IContentCdnService cdnService)
 		{
 			_configService = configService;
-			_cdnApi = cdnApi;
+			_cdnService = cdnService;
 		}
 
 		[HttpGet]
@@ -38,16 +41,39 @@ namespace Our.Umbraco.CloudPurge.Controllers
 		public async Task<PurgeResponse> PurgeAll()
 		{
 			var request = new PurgeRequest(null, true);
-			var result = await _cdnApi.PurgeAsync(request);
+			var result = await _cdnService.PurgeAsync(request);
 			return result;
 		}
 
 		[HttpGet]
-		public async Task<bool> Purge(int id, bool descendants = false)
+		public async Task<PurgeResponse> Purge(int id, bool descendants = false)
 		{
-			//var request = new PurgeRequest(null, true);
-			//var result = await _cdnApi.PurgeAsync(request);
-			return true;
+			var content = UmbracoContext.Content.GetById(id);
+
+			if(content == null)
+				throw new HttpException(404, $"Content {id} not found");
+
+			if (descendants)
+			{
+				var descendents = GetDescendents(content);
+				return await _cdnService.PurgeAsync(descendents);
+			}
+
+			return await _cdnService.PurgeAsync(new[] {content});
+		}
+
+		private IEnumerable<IPublishedContent> GetDescendents(IPublishedContent parent)
+		{
+			yield return parent;
+
+			if(parent.Children == null)
+				yield break;
+
+			foreach (var child in parent.Children)
+			foreach (var grandChild in GetDescendents(child))
+			{
+				yield return grandChild;
+			}
 		}
 	}
 }

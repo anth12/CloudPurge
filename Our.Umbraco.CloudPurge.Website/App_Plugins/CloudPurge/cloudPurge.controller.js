@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("CloudPurge.DashboardController",
-	function ($scope, cloudPurgeService, notificationsService) {
+	function ($scope, cloudPurgeService, notificationsService, contentTypeResource) {
 
 		$scope.confirmPurgeNow = false;
 		$scope.loading = true;

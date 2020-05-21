@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Models;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
 	public interface IContentCdnService : IDisposable
 	{
-		Task PurgeAsync(IEnumerable<IContent> content);
+		Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content);
 
-		Task PurgeAsync(PurgeRequest request);
+		Task<PurgeResponse> PurgeAsync(PurgeRequest request);
 	}
 }

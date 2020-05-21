@@ -1,4 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Linq;
+using System.Runtime.Serialization;
+using Umbraco.Core.Models;
 
 namespace Our.Umbraco.CloudPurge.Config
 {
@@ -14,9 +17,30 @@ namespace Our.Umbraco.CloudPurge.Config
 		}
 
 		[DataMember]
-		public string[] IncludedContentTypes { get; set; }
+		public string[] IncludedContentTypes { get; set; } = Array.Empty<string>();
 
 		[DataMember]
-		public string[] ExcludedContentTypes { get; set; }
+		public string[] ExcludedContentTypes { get; set; } = Array.Empty<string>();
+
+		public bool FilterContent(IContentType contentType)
+		{
+			if (ExcludedContentTypes.Any())
+			{
+				if (ExcludedContentTypes.Contains(contentType.Alias) 
+				    || contentType.CompositionAliases().Any(ExcludedContentTypes.Contains))
+					return false;
+			}
+
+			if (IncludedContentTypes.Any())
+			{
+				if (IncludedContentTypes.Contains(contentType.Alias) 
+				    || contentType.CompositionAliases().Any(IncludedContentTypes.Contains))
+					return true;
+
+				return false;
+			}
+
+			return true;
+		}
 	}
 }

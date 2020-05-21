@@ -7,7 +7,7 @@ namespace Our.Umbraco.CloudPurge.Config
 	{
 		public CloudPurgeConfig()
 		{
-			CloudFlare = new CloudFlareConfig("", "", "");
+			CloudFlare = new CloudFlareConfig(false, "", "", "");
 		}
 
 		public CloudPurgeConfig(bool enablePublishHooks, ContentFilterConfig contentFilter, CloudFlareConfig cloudFlare)

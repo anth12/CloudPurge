@@ -19,8 +19,27 @@
 				</div>
 			</umb-control-group>
 
+			<umb-control-group label="@cloudpurge_contentFilter_includedContentTypes">
+				<input name="EmailAddress"
+				       type="text"
+				       class="input-block-level"
+				       ng-model="config.ContentFilter.IncludedContentTypes"
+				       ng-disabled="!config.EnablePublishHooks"
+				       required />
+			</umb-control-group>
+
+			<umb-control-group label="@cloudpurge_contentFilter_excludedContentTypes">
+				<input name="Token"
+				       type="text"
+				       class="input-block-level"
+				       ng-model="config.ContentFilter.ExcludedContentTypes"
+				       ng-disabled="!config.EnablePublishHooks"
+				       required />
+			</umb-control-group>
+
 		</umb-box-content>
 	</umb-box>
+
 	<umb-box>
 		<umb-box-header title="CloudFlare" />
 		<umb-box-content>

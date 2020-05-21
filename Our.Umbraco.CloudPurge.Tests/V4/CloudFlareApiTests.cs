@@ -5,12 +5,12 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Models;
-using Our.Umbraco.CloudPurge.V4;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Our.Umbraco.CloudPurge.Cdn;
+using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.CDN.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
 
@@ -20,7 +20,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 	{
 		private class MockProvider
 		{
-			public readonly CloudPurgeConfig Config = new CloudPurgeConfig(true, null, new CloudFlareConfig("mock@example.co.uk", "mock-token", "mock-zone-id"));
+			public CloudPurgeConfig Config { get; set; } = new CloudPurgeConfig(true, null, new CloudFlareConfig(true, "mock@example.co.uk", "mock-token", "mock-zone-id"));
 			public readonly Mock<IConfigService> CloudFlareConfigFactoryMock = new Mock<IConfigService>();
 			public readonly Mock<HttpMessageHandler> HttpMessageHandlerMock = new Mock<HttpMessageHandler>();
 			public HttpClient HttpClient;
@@ -30,6 +30,23 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 				CloudFlareConfigFactoryMock.Setup(f => f.GetConfig()).Returns(Config);
 				HttpClient = new HttpClient(HttpMessageHandlerMock.Object);
 				return new CloudFlareV4Api(CloudFlareConfigFactoryMock.Object, HttpClient);
+			}
+		}
+
+		[TestCase(true, true)]
+		[TestCase(false, false)]
+		public void IsEnabled_GivenConfigValue_ThenReturnsConfig(bool configMock, bool expected)
+		{
+			var mockProvider = new MockProvider
+			{
+				Config = new CloudPurgeConfig(true, null, new CloudFlareConfig(configMock, null, null, null))
+			};
+
+			using (var instance = mockProvider.GetInstance())
+			{
+				var result = instance.IsEnabled();
+
+				Assert.AreEqual(expected, result);
 			}
 		}
 

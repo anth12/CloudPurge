@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Our.Umbraco.CloudPurge.Cdn;
+using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
-using Our.Umbraco.CloudPurge.V4;
 
 namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {

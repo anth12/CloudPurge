@@ -32,7 +32,7 @@ namespace Our.Umbraco.CloudPurge.Config
 				return _config = ReadConfigFromFile()
 					?? new CloudPurgeConfig(false,
 						new ContentFilterConfig(Array.Empty<string>(), Array.Empty<string>()),
-						new CloudFlareConfig("", "", ""));
+						new CloudFlareConfig(false, "", "", ""));
 			}
 		}
 
