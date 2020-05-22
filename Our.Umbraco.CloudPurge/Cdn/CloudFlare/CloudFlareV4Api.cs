@@ -63,6 +63,8 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			var batchCounter = 0;
 			var urlBatches = request.Urls.GroupBy(u => batchCounter++ / MaxRequestSize).ToArray();
 
+			_logger.Debug("Sending purge request in {BatchCount} batches", urlBatches.Length);
+
 			var tasks = urlBatches.Select(urls =>
 			{
 				var apiRequest = new PurgeFilesCacheRequest(urls);
@@ -128,7 +130,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			if (request != null)
 			{
 				var json = JsonConvert.SerializeObject(request);
-				_logger.Verbose("Sending {RequestType} with payload {payload}", request.GetType().Name, json);
+				_logger.Debug("Sending {RequestType} with payload {payload}", request.GetType().Name, json);
 
 				httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 			}
@@ -136,11 +138,23 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			httpRequest.Headers.Add("X-Auth-Key", config.CloudFlare.Token);
 			httpRequest.Headers.Add("X-Auth-Email", config.CloudFlare.EmailAddress);
 
-			var httpResponse = await _httpClient.SendAsync(httpRequest);
+			HttpResponseMessage httpResponse;
+			try
+			{
+				httpResponse = await _httpClient.SendAsync(httpRequest);
+			}
+			catch (Exception ex)
+			{
+				_logger.Error("Failed to send request", ex);
+
+				return (default, ex);
+			}
 
 			try
 			{
 				var responseContent = await httpResponse.Content.ReadAsStringAsync();
+				_logger.Verbose("Deserializing response {ResponseType} from {Response} ", typeof(TResponse).Name, responseContent);
+
 				var response = JsonConvert.DeserializeObject<TResponse>(responseContent);
 
 				return (response, null);

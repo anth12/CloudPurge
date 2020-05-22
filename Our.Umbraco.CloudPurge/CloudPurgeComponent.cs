@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Services;
+using Serilog;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Services;
@@ -13,11 +14,13 @@ namespace Our.Umbraco.CloudPurge
 {
 	internal class CloudPurgeComponent : IComponent
 	{
+		private readonly ILogger _logger;
 		private readonly IContentCdnService _contentCdnService;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;
 
 		public CloudPurgeComponent(IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory)
 		{
+			_logger = Log.ForContext<CloudPurgeComposer>();
 			_contentCdnService = contentCdnService;
 			_umbracoContextFactory = umbracoContextFactory;
 		}
@@ -70,8 +73,13 @@ namespace Our.Umbraco.CloudPurge
 					}
 					else
 					{
+						_logger.Error("Failed to purge cache for {FailedUrlCount} urls ((failedUrls}). With messages {failMessages}",
+							result.FailedUrls.Count(),
+							result.FailedUrls,
+							result.FailMessages);
+
 						messages.Add(new EventMessage("CloudPurge",
-							$"Something went wrong clearing CDN cache", EventMessageType.Warning));
+							"Something went wrong clearing CDN cache", EventMessageType.Warning));
 
 						foreach (var failMessage in result.FailMessages.Take(5))
 						{
@@ -86,6 +94,8 @@ namespace Our.Umbraco.CloudPurge
 				}
 				catch (Exception ex)
 				{
+					_logger.Error("Failed to purge cache", ex);
+
 					messages.Add(new EventMessage("CloudPurge",
 						"Something went wrong clearing CDN cache", EventMessageType.Error));
 				}
