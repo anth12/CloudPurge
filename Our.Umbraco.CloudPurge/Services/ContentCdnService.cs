@@ -4,17 +4,14 @@ using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
-using Serilog;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
 	public class ContentCdnService : IContentCdnService
 	{
-		private readonly ILogger _logger;
 		private readonly IEnumerable<ICdnApi> _cdnApis;
 		private readonly IConfigService _configService;
 		private readonly IContentTypeService _contentTypeService;
@@ -22,8 +19,6 @@ namespace Our.Umbraco.CloudPurge.Services
 
 		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService, IUmbracoContextFactory umbracoContextFactory)
 		{
-			_logger = Log.ForContext<ContentCdnService>();
-
 			_cdnApis = cdnApis;
 			_configService = configService;
 			_contentTypeService = contentTypeService;

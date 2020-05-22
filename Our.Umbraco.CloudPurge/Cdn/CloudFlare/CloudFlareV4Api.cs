@@ -10,7 +10,7 @@ using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
-using Serilog;
+using Umbraco.Core.Logging;
 
 namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 {
@@ -23,11 +23,11 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 		private const string Endpoint = "https://api.cloudflare.com/client/v4";
 		private const int MaxRequestSize = 30;
 
-		public CloudFlareV4Api(IConfigService configService, HttpClient httpClient)
+		public CloudFlareV4Api(IConfigService configService, HttpClient httpClient, ILogger logger)
 		{
-			_logger = Log.ForContext<CloudFlareV4Api>();
 			_configService = configService;
 			_httpClient = httpClient;
+			_logger = logger;
 		}
 
 		public bool IsEnabled()
@@ -63,7 +63,8 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			var batchCounter = 0;
 			var urlBatches = request.Urls.GroupBy(u => batchCounter++ / MaxRequestSize).ToArray();
 
-			_logger.Debug("Sending purge request in {BatchCount} batches", urlBatches.Length);
+			if(urlBatches.Length > 0)
+				_logger.Debug<CloudFlareV4Api>("Sending purge request in {BatchCount} batches", urlBatches.Length);
 
 			var tasks = urlBatches.Select(urls =>
 			{
@@ -130,7 +131,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			if (request != null)
 			{
 				var json = JsonConvert.SerializeObject(request);
-				_logger.Debug("Sending {RequestType} with payload {payload}", request.GetType().Name, json);
+				_logger.Debug<CloudFlareV4Api>("Sending {RequestType} with payload {payload}", request.GetType().Name, json);
 
 				httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
 			}
@@ -145,7 +146,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("Failed to send request", ex);
+				_logger.Error<CloudFlareV4Api>("Failed to send request", ex);
 
 				return (default, ex);
 			}
@@ -153,7 +154,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			try
 			{
 				var responseContent = await httpResponse.Content.ReadAsStringAsync();
-				_logger.Verbose("Deserializing response {ResponseType} from {Response} ", typeof(TResponse).Name, responseContent);
+				_logger.Verbose<CloudFlareV4Api>("Deserializing response {ResponseType} from {Response} ", typeof(TResponse).Name, responseContent);
 
 				var response = JsonConvert.DeserializeObject<TResponse>(responseContent);
 
@@ -161,7 +162,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			}
 			catch (Exception ex)
 			{
-				_logger.Error("Error response", ex);
+				_logger.Error<CloudFlareV4Api>("Error response", ex);
 
 				if (httpResponse.IsSuccessStatusCode)
 					return (default, new Exception($"Unsuccessful response code {httpResponse.StatusCode}"));

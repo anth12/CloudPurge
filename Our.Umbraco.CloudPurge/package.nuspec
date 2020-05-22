@@ -8,6 +8,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
 		<description>Clear CDN cache for Umbraco on content save</description>
+		<iconUrl>https://raw.githubusercontent.com/anth12/CloudPurge/master/logo.png</iconUrl>
 		<releaseNotes>
 			v0.0.3    - Verbose logging
 			v0.0.2    - Target Umbraco 8.5.5
