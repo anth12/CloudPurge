@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Services;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -15,14 +16,16 @@ namespace Our.Umbraco.CloudPurge
 	internal class CloudPurgeComponent : IComponent
 	{
 		private readonly ILogger _logger;
+		private readonly IConfigService _configService;
 		private readonly IContentCdnService _contentCdnService;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-		public CloudPurgeComponent(IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
+		public CloudPurgeComponent(ILogger logger, IConfigService configService, IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory)
 		{
+			_logger = logger;
+			_configService = configService;
 			_contentCdnService = contentCdnService;
 			_umbracoContextFactory = umbracoContextFactory;
-			_logger = logger;
 		}
 
 		public void Initialize()
@@ -36,6 +39,9 @@ namespace Our.Umbraco.CloudPurge
 
 		private void ContentService_Published(IContentService sender, ContentPublishedEventArgs e)
 		{
+			if (!PublishHookEnabled())
+				return;
+
 			var contentIds = e.PublishedEntities.Select(c => c.Id);
 
 			PurgeCache(e.Messages, contentIds);
@@ -43,6 +49,9 @@ namespace Our.Umbraco.CloudPurge
 
 		private void ContentService_Unpublishing(IContentService sender, PublishEventArgs<global::Umbraco.Core.Models.IContent> e)
 		{
+			if (!PublishHookEnabled())
+				return;
+
 			var contentIds = e.PublishedEntities.Select(c => c.Id);
 
 			PurgeCache(e.Messages, contentIds);
@@ -50,11 +59,16 @@ namespace Our.Umbraco.CloudPurge
 
 		private void ContentService_Moved(IContentService sender, MoveEventArgs<global::Umbraco.Core.Models.IContent> e)
 		{
+			if (!PublishHookEnabled())
+				return;
+
 			var contentIds = e.MoveInfoCollection.Select(c => c.Entity.Id);
 
 			PurgeCache(e.Messages, contentIds);
-
 		}
+
+		private bool PublishHookEnabled()
+			=> _configService.GetConfig().EnablePublishHooks;
 
 		private void PurgeCache(EventMessages messages, IEnumerable<int> contentIds)
 		{

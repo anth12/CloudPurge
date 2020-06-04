@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>CloudPurge</id>
-		<version>0.0.3</version>
+		<version>$version$</version>
 		<title>CloudPurge for Umbraco</title>
 		<authors>Anthony Halliday</authors>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -10,6 +10,8 @@
 		<description>Clear CDN cache for Umbraco on content save</description>
 		<iconUrl>https://raw.githubusercontent.com/anth12/CloudPurge/master/logo.png</iconUrl>
 		<releaseNotes>
+			v0.0.5    - Backoffice Content Type picker
+			v0.0.4    - PublishHookEnabled switch
 			v0.0.3    - Verbose logging
 			v0.0.2    - Target Umbraco 8.5.5
 			v0.0.1    - Initial release

@@ -1,6 +1,7 @@
 ﻿angular.module('umbraco').factory('cloudPurgeService',
     function ($http) {
 
+
         function prepareResponse(response) {
             response.data.ContentFilter.IncludedContentTypes =
                 response.data.ContentFilter.IncludedContentTypes.join(',');

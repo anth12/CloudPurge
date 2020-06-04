@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("CloudPurge.DashboardController",
-	function ($scope, cloudPurgeService, notificationsService, contentTypeResource) {
+	function ($scope, cloudPurgeService, notificationsService, editorService, contentTypeResource) {
 
 		$scope.confirmPurgeNow = false;
 		$scope.loading = true;
@@ -13,6 +13,10 @@
 			console.error(ex);
 
 			$scope.loading = false;
+		});
+
+		contentTypeResource.getAll().then(function(contentTypes) {
+			$scope.allContentTypes = contentTypes;
 		});
 
 		// #region event handlers
@@ -51,6 +55,25 @@
 
 				$scope.loading = false;
 				$scope.confirmPurgeNow = false;
+			});
+		}
+
+		$scope.selectContent = function(property) {
+			
+			editorService.contentTypePicker({
+				multiPicker: true,
+
+				submit: function (model) {
+					
+					editorService.close();
+
+					var selectedContentTypeIds = model.selection.map(s => s.id);
+					var selectedContentTypes = $scope.allContentTypes.filter(c => selectedContentTypeIds.indexOf(c.id) > -1);
+					$scope.config.ContentFilter[property] = selectedContentTypes.map(c => c.alias).join(',');
+				},
+				close: function () {
+					editorService.close();
+				}
 			});
 		}
 

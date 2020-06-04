@@ -13,6 +13,7 @@ using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.CDN.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
+using Umbraco.Core.Logging;
 
 namespace Our.Umbraco.CloudPurge.Tests.V4
 {
@@ -23,13 +24,14 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			public CloudPurgeConfig Config { get; set; } = new CloudPurgeConfig(true, null, new CloudFlareConfig(true, "mock@example.co.uk", "mock-token", "mock-zone-id"));
 			public readonly Mock<IConfigService> CloudFlareConfigFactoryMock = new Mock<IConfigService>();
 			public readonly Mock<HttpMessageHandler> HttpMessageHandlerMock = new Mock<HttpMessageHandler>();
+			public readonly Mock<ILogger> LoggerMock = new Mock<ILogger>();
 			public HttpClient HttpClient;
 
 			public ICdnApi GetInstance()
 			{
 				CloudFlareConfigFactoryMock.Setup(f => f.GetConfig()).Returns(Config);
 				HttpClient = new HttpClient(HttpMessageHandlerMock.Object);
-				return new CloudFlareV4Api(CloudFlareConfigFactoryMock.Object, HttpClient);
+				return new CloudFlareV4Api(CloudFlareConfigFactoryMock.Object, HttpClient, LoggerMock.Object);
 			}
 		}
 
