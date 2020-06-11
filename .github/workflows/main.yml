@@ -11,5 +11,5 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.0
 
     - name: MSBuild
-      working-directory: src/Our.Umbraco.CloudPurge
+      working-directory: Our.Umbraco.CloudPurge
       run: msbuild Our.Umbraco.CloudPurge.csproj
