@@ -1,4 +1,8 @@
 # CloudPurge
+
+
+[![nuGet](https://badgen.net/nuget/v/CloudPurge)](https://www.nuget.org/packages/CloudPurge)
+
 Umbraco backoffice extension to clear CDN cache on content saving events. 
 CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.
 
