@@ -5,8 +5,9 @@
 	</area>
 	<area alias="cloudpurge">
 		<key alias="enablePublishingHooks">Enable Publishing hooks</key>
-		<key alias="enablePublishingHooks_Desc"><![CDATA[
-        <p>Clears CDN cache on Publishing/Unpublishing events.				</p>
+		<key alias="enablePublishingHooks_Desc">
+			<![CDATA[
+        <p>Clears CDN cache on Publishing/Unpublishing events.</p>
 				]]>
 		</key>
 		<key alias="action">Purge CDN Cache</key>

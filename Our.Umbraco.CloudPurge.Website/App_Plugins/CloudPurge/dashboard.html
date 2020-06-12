@@ -1,5 +1,4 @@
 ﻿<div ng-controller="CloudPurge.DashboardController">
-
 	<umb-load-indicator ng-if="loading"></umb-load-indicator>
 
 	<umb-box ng-if="!loading">
@@ -28,13 +27,13 @@
 					   required />
 
 				<umb-button type="button"
-				            action="selectContent('IncludedContentTypes')"
-				            button-style="info"
-				            label="Select"
+							action="selectContent('IncludedContentTypes')"
+							button-style="info"
+							label="Select"
 							ng-if="allContentTypes != null"
-				            disabled="loading"></umb-button>
+							disabled="loading"></umb-button>
 			</umb-control-group>
-			
+
 			<umb-control-group label="@cloudpurge_contentFilter_excludedContentTypes">
 				<input name="ExcludedContentTypes"
 					   type="text"
@@ -44,11 +43,11 @@
 					   required />
 
 				<umb-button type="button"
-				            action="selectContent('ExcludedContentTypes')"
-				            button-style="info"
-				            label="Select"
-				            ng-if="allContentTypes != null"
-				            disabled="loading"></umb-button>
+							action="selectContent('ExcludedContentTypes')"
+							button-style="info"
+							label="Select"
+							ng-if="allContentTypes != null"
+							disabled="loading"></umb-button>
 			</umb-control-group>
 
 		</umb-box-content>
@@ -130,8 +129,6 @@
 			</umb-button>
 
 		</umb-editor-footer-content-right>
-
-
+		
 	</umb-editor-footer>
-
 </div>

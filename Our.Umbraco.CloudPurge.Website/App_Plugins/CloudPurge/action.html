@@ -6,7 +6,7 @@
 				<div class="alert alert-error">
 					<h3>Something went wrong</h3>
 					<div><p ng-repeat="(k, error) in result.failMessages">{{error}}</p></div>
-					
+
 					<h3 ng-show="result.failedUrls.length > 0">
 						<localize key="cloudpurge_notPurgedUrls"></localize>
 					</h3>
@@ -19,8 +19,8 @@
 					<strong>{{source.name}}</strong>
 					<span ng-if="decendants">
 						(<localize key="cloudpurge_alongWithDecendants"></localize>)
-					</span>					
-					 <localize key="cloudpurge_purged"></localize>
+					</span>
+					<localize key="cloudpurge_purged"></localize>
 				</div>
 				<button class="btn btn-primary" ng-click="closeDialog()">Ok</button>
 			</div>

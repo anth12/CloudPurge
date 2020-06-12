@@ -4,18 +4,18 @@
 		$scope.confirmPurgeNow = false;
 		$scope.loading = true;
 
-		cloudPurgeService.getConfig().then(function(response) {
+		cloudPurgeService.getConfig().then(function (response) {
 			$scope.config = response.data;
 			$scope.loading = false;
 
-		}).catch(function(ex) {
+		}).catch(function (ex) {
 			notificationsService.error('An error occurred while loading the CloudPurge config.')
 			console.error(ex);
 
 			$scope.loading = false;
 		});
 
-		contentTypeResource.getAll().then(function(contentTypes) {
+		contentTypeResource.getAll().then(function (contentTypes) {
 			$scope.allContentTypes = contentTypes;
 		});
 
@@ -40,7 +40,7 @@
 		}
 
 		$scope.purgeNow = function () {
-			
+
 			$scope.loading = true;
 
 			cloudPurgeService.purgeAll().then(function (response) {
@@ -58,13 +58,13 @@
 			});
 		}
 
-		$scope.selectContent = function(property) {
-			
+		$scope.selectContent = function (property) {
+
 			editorService.contentTypePicker({
 				multiPicker: true,
 
 				submit: function (model) {
-					
+
 					editorService.close();
 
 					var selectedContentTypeIds = model.selection.map(s => s.id);
