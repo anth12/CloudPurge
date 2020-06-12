@@ -6,14 +6,10 @@
 	<Authors>Anthony Halliday</Authors>
     <Version>0.0.6</Version>
     <PackageTags>Umbraco,Cache,PurgeCache,Cach,Cloudflare</PackageTags>
-    <Description>
-      Umbraco backoffice extension to clear CDN cache on content saving events. 
-	  CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.
-    </Description>
 	
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
-	<description>Clear CDN cache for Umbraco on content save</description>
+	<description>Umbraco backoffice extension to clear CDN cache on content saving events. CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.</description>
 	<PackageReleaseNotes>
 		v0.0.6    - .net standard csproj migration
 		v0.0.5    - Backoffice Content Type picker

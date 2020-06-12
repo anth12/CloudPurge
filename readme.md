@@ -7,4 +7,4 @@ CloudPurge also adds a context menu action to the Content tree allowing cache to
 ## Suported CDN providers
  - CloudFlare
 
-Logo: cloud wind by newstudiodesign10 from the Noun Project
+Wind Cloud by sandra from the Noun Project
