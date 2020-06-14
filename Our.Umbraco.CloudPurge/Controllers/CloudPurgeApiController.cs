@@ -40,8 +40,8 @@ namespace Our.Umbraco.CloudPurge.Controllers
 		[HttpGet]
 		public async Task<PurgeResponse> PurgeAll()
 		{
-			var request = new PurgeRequest(null, true);
-			var result = await _cdnService.PurgeAsync(request);
+			var request = new PurgeAllRequest();
+			var result = await _cdnService.PurgeAllAsync(request);
 			return result;
 		}
 

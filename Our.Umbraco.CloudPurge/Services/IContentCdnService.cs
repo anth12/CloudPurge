@@ -11,5 +11,7 @@ namespace Our.Umbraco.CloudPurge.Services
 		Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content);
 
 		Task<PurgeResponse> PurgeAsync(PurgeRequest request);
+
+		Task<PurgeResponse> PurgeAllAsync(PurgeAllRequest request);
 	}
 }

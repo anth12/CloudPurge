@@ -5,8 +5,7 @@
 	<Title>CloudPurge for Umbraco</Title>
 	<Authors>Anthony Halliday</Authors>
     <Version>0.0.6</Version>
-    <PackageTags>Umbraco,Cache,PurgeCache,Cach,Cloudflare</PackageTags>
-	
+    <PackageTags>Umbraco,Cache,PurgeCache,Cach,Cloudflare</PackageTags>	
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
 	<description>Umbraco backoffice extension to clear CDN cache on content saving events. CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.</description>
@@ -20,7 +19,6 @@
 	</PackageReleaseNotes>
 	<RepositoryUrl>https://github.com/anth12/CloudPurge</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
-
 	<IsPackable>true</IsPackable>
   </PropertyGroup>
   
@@ -32,20 +30,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <!-- <Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*.*" Link="App_Plugins\%(RecursiveDir)%(Filename)%(Extension)"> -->
-		<!-- <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> -->
-	  <!-- </Content> -->
 	  
 	<Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*">
 	  <Pack>true</Pack>
 	  <PackagePath>content\App_Plugins\</PackagePath>
 	  <PackageCopyToOutput>true</PackageCopyToOutput>
 	</Content>
-	      
-  <!-- <Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*" CopyToPublishDirectory="PreserveNewest" Link="App_Plugins\%(RecursiveDir)\%(Filename)%(Extension)" /> -->
-
-	<!-- <Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*.*" LinkBase="App_Plugins" CopyToOutputDirectory="Always" /> -->
-	<!-- <file src="Our.Umbraco.CloudPurge.targets" target="build"/> -->
+	
   </ItemGroup>
   
   <ItemGroup>

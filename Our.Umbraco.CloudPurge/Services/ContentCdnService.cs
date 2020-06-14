@@ -7,6 +7,7 @@ using Our.Umbraco.CloudPurge.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Our.Umbraco.CloudPurge.Utilities;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
@@ -43,7 +44,7 @@ namespace Our.Umbraco.CloudPurge.Services
 					from culture in contentItem.Cultures
 					select context.UmbracoContext.UrlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key);
 
-				var request = new PurgeRequest(urls, false);
+				var request = new PurgeRequest(urls);
 
 				return PurgeAsync(request);
 			}
@@ -51,9 +52,23 @@ namespace Our.Umbraco.CloudPurge.Services
 
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
 		{
-			var purgeTasks = _cdnApis.Where(c => c.IsEnabled())
-				.Select(cdn => cdn.PurgeAsync(request));
+			var maxRequestSize = _cdnApis.Min(c => c.MaxBatchSize);
 
+			var batches = request.Urls.Batch(maxRequestSize, c => new PurgeRequest(c));
+
+			var purgeTasks = _cdnApis.Where(c => c.IsEnabled())
+				.SelectMany(cdn => batches.Select(cdn.PurgeByUrlAsync));
+			
+			var results = await Task.WhenAll(purgeTasks);
+
+			return PurgeResponse.Aggregate(results);
+		}
+
+		public async Task<PurgeResponse> PurgeAllAsync(PurgeAllRequest request)
+		{
+			var purgeTasks = _cdnApis.Where(c => c.IsEnabled())
+				.Select(cdn => cdn.PurgeAllAsync(request));
+			
 			var results = await Task.WhenAll(purgeTasks);
 
 			return PurgeResponse.Aggregate(results);

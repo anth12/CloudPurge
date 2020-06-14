@@ -6,8 +6,11 @@ namespace Our.Umbraco.CloudPurge.Cdn
 {
 	public interface ICdnApi : IDisposable
 	{
+		int MaxBatchSize { get; }
 		bool IsEnabled();
 		Task<bool> HealthCheckAsync();
-		Task<PurgeResponse> PurgeAsync(PurgeRequest request);
+
+		Task<PurgeResponse> PurgeByUrlAsync(PurgeRequest request);
+		Task<PurgeResponse> PurgeAllAsync(PurgeAllRequest request);
 	}
 }

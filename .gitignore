@@ -357,3 +357,4 @@ Logs/
 TEMP/
 *.sdf
 CloudPurge.config
+Our.Umbraco.CloudPurge.Website/App_Data/Models/all.dll.path

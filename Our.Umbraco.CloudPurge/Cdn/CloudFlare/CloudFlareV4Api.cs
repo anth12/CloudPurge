@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization;
@@ -9,6 +8,7 @@ using Newtonsoft.Json;
 using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
 using Our.Umbraco.CloudPurge.Config;
+using Our.Umbraco.CloudPurge.Domain;
 using Our.Umbraco.CloudPurge.Models;
 using Umbraco.Core.Logging;
 
@@ -30,99 +30,84 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			_logger = logger;
 		}
 
-		public bool IsEnabled()
-			=> _configService.GetConfig().CloudFlare.Enabled;
+		public int MaxBatchSize => MaxRequestSize;
+		public bool IsEnabled() => _configService.GetConfig().CloudFlare.Enabled;
 
-		public Task<PurgeResponse> PurgeAsync(PurgeRequest request)
+		public async Task<PurgeResponse> PurgeByUrlAsync(PurgeRequest request)
 		{
-			return request.Everything 
-				? PurgeEverythingAsync() 
-				: PurgeUrlsAsync(request);
+			var config = _configService.GetConfig();
+
+			var apiRequest = new PurgeFilesCacheRequest(request.Urls);
+
+			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
+
+			try
+			{
+				var result = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Post, apiRequest);
+
+				return new PurgeResponse(
+					success: result.Success,
+					cdnType: CdnType.CloudFlare,
+					failedUrls: null, // TODO
+					failMessages: (result.Messages ?? Array.Empty<string>()).Union(result.Errors?.Select(e=> e.Message) ?? Array.Empty<string>()),
+					exception: null);
+			}
+			catch (Exception ex)
+			{
+				return new PurgeResponse(
+					success: false,
+					cdnType: CdnType.CloudFlare,
+					failedUrls: request.Urls,
+					failMessages: null,
+					exception: new AggregateException(ex));
+			}
 		}
 
-		private async Task<PurgeResponse> PurgeEverythingAsync()
+		public async Task<PurgeResponse> PurgeAllAsync(PurgeAllRequest request)
 		{
 			var config = _configService.GetConfig();
 
 			var apiRequest = new PurgeAllCacheRequest(true);
 
 			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
-			var (result, error) = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeAllCacheRequest>(uri, HttpMethod.Post, apiRequest);
-
-			return new PurgeResponse(
-				success: result?.Success ?? false,
-				failedUrls: null,
-				failMessages: result?.Messages,
-				exception: error != null ? new AggregateException(error) : null);
-		}
-
-		private async Task<PurgeResponse> PurgeUrlsAsync(PurgeRequest request)
-		{
-			var config = _configService.GetConfig();
-
-			var batchCounter = 0;
-			var urlBatches = request.Urls.GroupBy(u => batchCounter++ / MaxRequestSize).ToArray();
-
-			if(urlBatches.Length > 0)
-				_logger.Debug<CloudFlareV4Api>("Sending purge request in {BatchCount} batches", urlBatches.Length);
-
-			var tasks = urlBatches.Select(urls =>
+			try
 			{
-				var apiRequest = new PurgeFilesCacheRequest(urls);
+				var result = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeAllCacheRequest>(uri, HttpMethod.Post, apiRequest);
 
-				var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}/purge_cache");
-				return FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Post,
-					apiRequest);
-			});
-
-			var responses = await Task.WhenAll(tasks);
-
-			var errors = new List<Exception>();
-			var failedUrls = new List<string>();
-			var failMessages = new List<string>();
-
-			var batch = 0;
-			foreach (var (response, error) in responses)
-			{
-				if (error != null)
-				{
-					errors.Add(error);
-					failedUrls.AddRange(urlBatches[batch]);
-				}
-				else if (!response.Success)
-				{
-					failedUrls.AddRange(urlBatches[batch]);
-					failMessages.AddRange(response.Errors?.Select(e => e.Message) ?? Array.Empty<string>());
-
-					if (response.Messages?.Any() ?? false)
-						failMessages.AddRange(response.Messages);
-				}
-
-				batch++;
+				return new PurgeResponse(
+					success: result?.Success ?? false,
+					failedUrls: null,
+					failMessages: result?.Messages,
+					exception: null);
 			}
-
-			return new PurgeResponse(
-				success: !failedUrls.Any(),
-				failedUrls: failedUrls,
-				failMessages: failMessages,
-				exception: errors.Any() ? new AggregateException(errors) : null
-			);
+			catch (Exception ex)
+			{
+				return new PurgeResponse(
+					success: false,
+					failedUrls: null,
+					failMessages: null,
+					exception: new AggregateException(ex));
+			}
 		}
-
+		
 		public async Task<bool> HealthCheckAsync()
 		{
 			var config = _configService.GetConfig();
 
 			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}");
-			var (result, exception) = await FetchAsync<CloudFlareResponse<ZoneDetailsResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Get);
 
-			if (exception != null)
-				throw exception;
-
-			return !string.IsNullOrEmpty(result.Result?.Id);
+			try
+			{
+				var result = await FetchAsync<CloudFlareResponse<ZoneDetailsResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Get);
+				return result.Success;
+			}
+			catch (Exception ex)
+			{
+				return false;
+			}
 		}
 
-		private async Task<(TResponse, Exception)> FetchAsync<TResponse, TRequest>(Uri uri, HttpMethod method, TRequest request = default)
+		private async Task<TResponse> FetchAsync<TResponse, TRequest>(Uri uri, HttpMethod method, TRequest request = default)
 		{
 			var config = _configService.GetConfig();
 
@@ -148,7 +133,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			{
 				_logger.Error<CloudFlareV4Api>("Failed to send request", ex);
 
-				return (default, ex);
+				throw;
 			}
 
 			try
@@ -158,16 +143,16 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 
 				var response = JsonConvert.DeserializeObject<TResponse>(responseContent);
 
-				return (response, null);
+				return response;
 			}
 			catch (Exception ex)
 			{
-				_logger.Error<CloudFlareV4Api>("Error response", ex);
+				_logger.Error<CloudFlareV4Api>(ex, "Unable to deserialise CloudFlare. ResponseCode {responseCode}", httpResponse.StatusCode);
 
 				if (httpResponse.IsSuccessStatusCode)
-					return (default, new Exception($"Unsuccessful response code {httpResponse.StatusCode}"));
+					throw new Exception($"Unsuccessful response code {httpResponse.StatusCode}");
 
-				return (default, new SerializationException($"Unable to deserialise CloudFlare response to {typeof(TResponse)}", ex));
+				throw new SerializationException($"Unable to deserialise CloudFlare response to {typeof(TResponse)}", ex);
 			}
 		}
 
