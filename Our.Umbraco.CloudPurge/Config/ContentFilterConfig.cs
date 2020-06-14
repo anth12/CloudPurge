@@ -22,7 +22,7 @@ namespace Our.Umbraco.CloudPurge.Config
 		[DataMember]
 		public string[] ExcludedContentTypes { get; set; } = Array.Empty<string>();
 
-		public bool FilterContent(IContentType contentType)
+		public bool AllowedContent(IContentType contentType)
 		{
 			if (ExcludedContentTypes.Any())
 			{

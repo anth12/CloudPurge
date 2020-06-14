@@ -75,9 +75,9 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 				var result = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeAllCacheRequest>(uri, HttpMethod.Post, apiRequest);
 
 				return new PurgeResponse(
-					success: result?.Success ?? false,
+					success: result.Success,
 					failedUrls: null,
-					failMessages: result?.Messages,
+					failMessages: (result.Messages ?? Array.Empty<string>()).Union(result.Errors?.Select(e => e.Message) ?? Array.Empty<string>()),
 					exception: null);
 			}
 			catch (Exception ex)

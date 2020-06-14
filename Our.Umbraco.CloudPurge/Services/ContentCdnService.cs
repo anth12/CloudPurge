@@ -36,7 +36,7 @@ namespace Our.Umbraco.CloudPurge.Services
 			var contentTypes = _contentTypeService.GetAll(contentTypeIds).ToDictionary(c => c.Id, c => c);
 
 			var filteredContent =
-				publishedContent.Where(c => config.ContentFilter.FilterContent(contentTypes[c.ContentType.Id]));
+				publishedContent.Where(c => config.ContentFilter.AllowedContent(contentTypes[c.ContentType.Id]));
 
 			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
 			{
