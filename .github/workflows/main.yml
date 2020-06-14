@@ -13,3 +13,7 @@ jobs:
     - name: build
       working-directory: Our.Umbraco.CloudPurge
       run: dotnet build
+
+    - name: test
+      working-directory: Our.Umbraco.CloudPurge.Tests
+      run: dotnet test
