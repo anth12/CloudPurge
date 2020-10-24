@@ -4,19 +4,20 @@
     <PackageId>CloudPurge</PackageId>
 	<Title>CloudPurge for Umbraco</Title>
 	<Authors>Anthony Halliday</Authors>
-    <Version>0.0.6</Version>
+    <Version>0.0.7</Version>
     <PackageTags>Umbraco,Cache,PurgeCache,Cach,Cloudflare</PackageTags>	
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
 	<description>Umbraco backoffice extension to clear CDN cache on content saving events. CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.</description>
 	<PackageReleaseNotes>
-		v0.0.6    - .net standard csproj migration
-		v0.0.5    - Backoffice Content Type picker
-		v0.0.4    - PublishHookEnabled switch
-		v0.0.3    - Verbose logging
-		v0.0.2    - Target Umbraco 8.5.5
-		v0.0.1    - Initial release
-	</PackageReleaseNotes>
+    v0.0.7    - Removed empty requets when content is filtered
+    v0.0.6    - .net standard csproj migration
+    v0.0.5    - Backoffice Content Type picker
+    v0.0.4    - PublishHookEnabled switch
+    v0.0.3    - Verbose logging
+    v0.0.2    - Target Umbraco 8.5.5
+    v0.0.1    - Initial release
+  </PackageReleaseNotes>
 	<RepositoryUrl>https://github.com/anth12/CloudPurge</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 	<IsPackable>true</IsPackable>
@@ -31,12 +32,18 @@
 
   <ItemGroup>
 	  
-	<Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*">
-	  <Pack>true</Pack>
-	  <PackagePath>content\App_Plugins\</PackagePath>
-	  <PackageCopyToOutput>true</PackageCopyToOutput>
-	</Content>
-	
+	  <Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*">
+	    <Pack>true</Pack>
+	    <PackagePath>content\App_Plugins\</PackagePath>
+	    <PackageCopyToOutput>true</PackageCopyToOutput>
+	  </Content>
+
+    <Content Include="Config/CloudPurge.config">
+      <Pack>true</Pack>
+      <PackagePath>content\Config\</PackagePath>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
+    
   </ItemGroup>
   
   <ItemGroup>
