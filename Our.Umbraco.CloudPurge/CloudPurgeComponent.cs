@@ -80,12 +80,12 @@ namespace Our.Umbraco.CloudPurge
 				{
 					var result = Task.Run(() => _contentCdnService.PurgeAsync(content)).GetAwaiter().GetResult();
 					
-					if (result.Success)
+					if (result.Result == Models.PurgeResult.Success)
 					{
 						messages.Add(new EventMessage("CloudPurge",
 							"Cleared CDN cache", EventMessageType.Success));
 					}
-					else
+					else if (result.Result == Models.PurgeResult.Fail)
 					{
 						_logger.Error<CloudPurgeComposer>("Failed to purge cache for {FailedUrlCount} urls ((failedUrls}). With messages {failMessages}",
 							result.FailedUrls.Count(),

@@ -46,7 +46,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 				var result = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeFilesCacheRequest>(uri, HttpMethod.Post, apiRequest);
 
 				return new PurgeResponse(
-					success: result.Success,
+					result: result.Success ? PurgeResult.Success : PurgeResult.Fail,
 					cdnType: CdnType.CloudFlare,
 					failedUrls: null, // TODO
 					failMessages: (result.Messages ?? Array.Empty<string>()).Union(result.Errors?.Select(e=> e.Message) ?? Array.Empty<string>()),
@@ -55,7 +55,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			catch (Exception ex)
 			{
 				return new PurgeResponse(
-					success: false,
+					result: PurgeResult.Fail,
 					cdnType: CdnType.CloudFlare,
 					failedUrls: request.Urls,
 					failMessages: null,
@@ -75,7 +75,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 				var result = await FetchAsync<CloudFlareResponse<PurgeCacheResult>, PurgeAllCacheRequest>(uri, HttpMethod.Post, apiRequest);
 
 				return new PurgeResponse(
-					success: result.Success,
+					result: result.Success ? PurgeResult.Success : PurgeResult.Fail,
 					failedUrls: null,
 					failMessages: (result.Messages ?? Array.Empty<string>()).Union(result.Errors?.Select(e => e.Message) ?? Array.Empty<string>()),
 					exception: null);
@@ -83,7 +83,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 			catch (Exception ex)
 			{
 				return new PurgeResponse(
-					success: false,
+					result: PurgeResult.Fail,
 					failedUrls: null,
 					failMessages: null,
 					exception: new AggregateException(ex));

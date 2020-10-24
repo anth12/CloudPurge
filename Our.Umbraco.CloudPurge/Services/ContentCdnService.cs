@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Our.Umbraco.CloudPurge.Utilities;
+using Our.Umbraco.CloudPurge.Domain;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
@@ -26,7 +27,7 @@ namespace Our.Umbraco.CloudPurge.Services
 			_umbracoContextFactory = umbracoContextFactory;
 		}
 
-		public Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content)
+		public async Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content)
 		{
 			var config = _configService.GetConfig();
 
@@ -44,9 +45,16 @@ namespace Our.Umbraco.CloudPurge.Services
 					from culture in contentItem.Cultures
 					select context.UmbracoContext.UrlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key);
 
+				if(!urls.Any())
+					return new PurgeResponse(
+						result: PurgeResult.NothingPurged,
+						failedUrls: null,
+						failMessages: null,
+						exception: null);
+
 				var request = new PurgeRequest(urls);
 
-				return PurgeAsync(request);
+				return await PurgeAsync(request);
 			}
 		}
 
