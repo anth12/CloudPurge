@@ -67,7 +67,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			{
 				var result = await instance.PurgeByUrlAsync(request);
 
-				Assert.IsTrue(result.Success);
+				Assert.AreEqual(PurgeResult.Success, result.Result);
 				Assert.IsEmpty(result.FailMessages);
 				Assert.IsEmpty(result.FailedUrls);
 				Assert.IsNull(result.Exception);
@@ -90,7 +90,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			{
 				var result = await instance.PurgeByUrlAsync(request);
 
-				Assert.IsFalse(result.Success);
+				Assert.AreEqual(PurgeResult.Fail, result.Result);
 				Assert.AreEqual(2, result.FailMessages.Count());
 				Assert.AreEqual("mock-message", result.FailMessages.ElementAt(0));
 				Assert.AreEqual("mock-error", result.FailMessages.ElementAt(1));
@@ -118,7 +118,7 @@ namespace Our.Umbraco.CloudPurge.Tests.V4
 			{
 				var result = await instance.PurgeByUrlAsync(request);
 
-				Assert.IsFalse(result.Success);
+				Assert.AreEqual(PurgeResult.Fail, result.Result);
 				Assert.IsFalse(result.FailMessages.Any());
 				Assert.AreEqual(mockUrlsBatch, result.FailedUrls[CdnType.CloudFlare]);
 				Assert.IsNotNull(result.Exception);
