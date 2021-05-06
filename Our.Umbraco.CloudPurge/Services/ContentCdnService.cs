@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web;
 using Our.Umbraco.CloudPurge.Utilities;
 using Our.Umbraco.CloudPurge.Domain;
+using Umbraco.Cms.Core.Web;
 
 namespace Our.Umbraco.CloudPurge.Services
 {

@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Web.BackOffice.Trees;
 
-namespace Our.Umbraco.CloudPurge
+namespace Our.Umbraco.CloudPurge.Events
 {
     internal class MenuRenderingHandler : INotificationHandler<MenuRenderingNotification>
 	{
