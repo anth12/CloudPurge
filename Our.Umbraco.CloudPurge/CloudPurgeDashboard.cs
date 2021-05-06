@@ -1,6 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Dashboards;
 
 namespace Our.Umbraco.CloudPurge
 {

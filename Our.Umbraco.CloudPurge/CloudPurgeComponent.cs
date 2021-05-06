@@ -2,25 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Services;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web;
 
 namespace Our.Umbraco.CloudPurge
 {
 	internal class CloudPurgeComponent : IComponent
 	{
-		private readonly ILogger _logger;
+		private readonly ILogger<CloudPurgeComponent> _logger;
 		private readonly IConfigService _configService;
 		private readonly IContentCdnService _contentCdnService;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;
 
-		public CloudPurgeComponent(ILogger logger, IConfigService configService, IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory)
+		public CloudPurgeComponent(ILogger<CloudPurgeComponent> logger, IConfigService configService, IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory)
 		{
 			_logger = logger;
 			_configService = configService;
