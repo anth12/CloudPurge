@@ -2,12 +2,13 @@
 using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
 using Our.Umbraco.CloudPurge.Services;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Our.Umbraco.CloudPurge.Controllers
 {
@@ -16,6 +17,7 @@ namespace Our.Umbraco.CloudPurge.Controllers
 	{
 		private readonly IConfigService _configService;
 		private readonly IContentCdnService _cdnService;
+		private readonly IPublishedContentCache _content;
 
 		public CloudPurgeApiController(IConfigService configService, IContentCdnService cdnService)
 		{
@@ -46,20 +48,23 @@ namespace Our.Umbraco.CloudPurge.Controllers
 		}
 
 		[HttpGet]
-		public async Task<PurgeResponse> Purge(int id, bool descendants = false)
+		public async Task<IActionResult> Purge(int id, bool descendants = false)
 		{
-			var content = UmbracoContext.Content.GetById(id);
+			var content = _content.GetById(id);
 
 			if(content == null)
-				throw new HttpException(404, $"Content {id} not found");
+				return NotFound($"Content {id} not found");
 
+			PurgeResponse result;
 			if (descendants)
 			{
 				var descendents = GetDescendents(content);
-				return await _cdnService.PurgeAsync(descendents);
+				result = await _cdnService.PurgeAsync(descendents);
+				return Ok(result);
 			}
 
-			return await _cdnService.PurgeAsync(new[] {content});
+			result = await _cdnService.PurgeAsync(new[] {content});
+			return Ok(result);
 		}
 
 		private IEnumerable<IPublishedContent> GetDescendents(IPublishedContent parent)
