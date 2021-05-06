@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Our.Umbraco.CloudPurge.Config
 {

@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.IO;
 using System.Xml.Serialization;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.IO;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Our.Umbraco.CloudPurge.Config
 {
 	internal class ConfigFileService : IConfigService
 	{
-		private readonly ILogger _logger;
+		private readonly ILogger<ConfigFileService> _logger;
 		private readonly string _configFilePath;
 
-		public ConfigFileService(ILogger logger)
+		public ConfigFileService(ILogger<ConfigFileService> logger)
 		{
 			_logger = logger;
 			_configFilePath = IOHelper.MapPath($"{SystemDirectories.Config}/CloudPurge.config");
@@ -61,15 +62,13 @@ namespace Our.Umbraco.CloudPurge.Config
 			
 			try
 			{
-				using (var fileStream = File.OpenRead(_configFilePath))
-				{
-					var config = (CloudPurgeConfig)serializer.Deserialize(fileStream);
-					return config;
-				}
-			}
+                using var fileStream = File.OpenRead(_configFilePath);
+                var config = (CloudPurgeConfig)serializer.Deserialize(fileStream);
+                return config;
+            }
 			catch (Exception ex)
 			{
-				_logger.Error<ConfigFileService>("Error reading CloudPurge config file", ex);
+				_logger.LogError(ex, "Error reading CloudPurge config file @filePath", _configFilePath);
 				return null;
 			}
 		}
