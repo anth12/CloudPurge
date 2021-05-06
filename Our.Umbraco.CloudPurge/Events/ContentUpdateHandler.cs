@@ -50,7 +50,6 @@ namespace Our.Umbraco.CloudPurge.Events
 			return PurgeCacheAsync(notification.Messages, contentIds);
 		}
 
-
 		private async Task PurgeCacheAsync(EventMessages messages, IEnumerable<int> contentIds)
 		{
 			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
