@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Xml.Serialization;
@@ -12,10 +13,10 @@ namespace Our.Umbraco.CloudPurge.Config
 		private readonly ILogger<ConfigFileService> _logger;
 		private readonly string _configFilePath;
 
-		public ConfigFileService(ILogger<ConfigFileService> logger)
+		public ConfigFileService(ILogger<ConfigFileService> logger, IWebHostEnvironment webHostEnvironment)
 		{
 			_logger = logger;
-			_configFilePath = IOHelper.MapPath($"{SystemDirectories.Config}/CloudPurge.config");
+			_configFilePath = $"{webHostEnvironment.WebRootPath}/{SystemDirectories.Config}/CloudPurge.config";
 		}
 
 		private CloudPurgeConfig _config;
