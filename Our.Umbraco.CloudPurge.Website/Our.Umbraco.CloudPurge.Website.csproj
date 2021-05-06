@@ -9,9 +9,9 @@
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     </ItemGroup>
 
-    <Import Project="..\Our.Umbraco.CloudPurge\build\Our.Umbraco.CloudPurge.targets"/>
+    <Import Project="..\Our.Umbraco.CloudPurge\build\Our.Umbraco.CloudPurge.targets" />
     <ItemGroup>
-        <ProjectReference Include="..\Our.Umbraco.CloudPurge\Our.Umbraco.CloudPurge.csproj"/>
+        <ProjectReference Include="..\Our.Umbraco.CloudPurge\Our.Umbraco.CloudPurge.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -45,6 +45,14 @@
         <Content Remove="umbraco\logs\**" />
         <Content Remove="umbraco\MediaCache\**" />
         <Content Remove="umbraco\models\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="App_Plugins\CloudPurge\action.html" />
+      <Content Include="App_Plugins\CloudPurge\cloudPurge.controller.js" />
+      <Content Include="App_Plugins\CloudPurge\cloudPurge.service.js" />
+      <Content Include="App_Plugins\CloudPurge\dashboard.html" />
+      <Content Include="App_Plugins\CloudPurge\lang\en.xml" />
+      <Content Include="App_Plugins\CloudPurge\package.manifest" />
     </ItemGroup>
 
     <!--Set this to true ModelsBuilder mode is not PureLive -->

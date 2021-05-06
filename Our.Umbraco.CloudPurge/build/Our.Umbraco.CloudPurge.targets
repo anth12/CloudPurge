@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
-        <CloudPurgeContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\Our.Umbraco.CloudPurge\**\*.*</CloudPurgeContentFilesPath>
+        <CloudPurgeContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\CloudPurge\**\*.*</CloudPurgeContentFilesPath>
     </PropertyGroup>
 
     <Target Name="CopyCloudPurgeAssets" BeforeTargets="Build">
@@ -11,7 +11,7 @@
         <Message Text="Copying CloudPurge files: $(CloudPurgeContentFilesPath) - #@(CloudPurgeContentFiles->Count()) files"  Importance="high" />
         <Copy
             SourceFiles="@(CloudPurgeContentFiles)"
-            DestinationFiles="@(CloudPurgeContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\Our.Umbraco.CloudPurge\%(RecursiveDir)%(Filename)%(Extension)')"
+            DestinationFiles="@(CloudPurgeContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\CloudPurge\%(RecursiveDir)%(Filename)%(Extension)')"
             SkipUnchangedFiles="true" />
 
     </Target>
