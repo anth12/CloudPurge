@@ -1,28 +1,35 @@
 ﻿using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Extensions;
 
 namespace Our.Umbraco.CloudPurge.Events
 {
     internal class MenuRenderingHandler : INotificationHandler<MenuRenderingNotification>
 	{
+		private readonly ILocalizedTextService _localizedTextService;
 
-		//private static ILocalizedTextService LocalizedTextService => Current.Services.TextService;
+        public MenuRenderingHandler(ILocalizedTextService localizedTextService)
+        {
+			_localizedTextService = localizedTextService;
 
-		private static readonly MenuItem CloudPurgeMenuItem = new MenuItem("cloudPurge", "cloudpurge/action") // TODO
-		{
-			Icon = "cloud",
-			OpensDialog = true
-		};
-
+		}
+				
 		public void Handle(MenuRenderingNotification notification)
         {
 			if (notification.TreeAlias == "content")
 			{
-				CloudPurgeMenuItem.LaunchDialogView("/App_Plugins/CloudPurge/action.html",
-					"cloudpurge/action");
+				var cloudPurgeMenuItem = new MenuItem("cloudPurge", _localizedTextService.Localize("cloudpurge/action"))
+				{
+					Icon = "cloud",
+					OpensDialog = true
+				};
 
-				notification.Menu.Items.Add(CloudPurgeMenuItem);
+				cloudPurgeMenuItem.LaunchDialogView("/App_Plugins/CloudPurge/action.html", 
+					_localizedTextService.Localize("cloudpurge/action"));
+
+				notification.Menu.Items.Add(cloudPurgeMenuItem);
 			}
 		}
     }

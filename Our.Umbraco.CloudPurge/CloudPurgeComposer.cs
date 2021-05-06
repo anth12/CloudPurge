@@ -30,7 +30,6 @@ namespace Our.Umbraco.CloudPurge
 
 			builder.AddNotificationHandler<MenuRenderingNotification, MenuRenderingHandler>();
 			builder.AddNotificationAsyncHandler<ContentTreeChangeNotification, ContentUpdateHandler>();
-
 		}
 	}
 }
