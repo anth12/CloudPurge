@@ -6,26 +6,27 @@ using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web;
 using Our.Umbraco.CloudPurge.Utilities;
-using Our.Umbraco.CloudPurge.Domain;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Routing;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
-	public class ContentCdnService : IContentCdnService
+    public class ContentCdnService : IContentCdnService
 	{
 		private readonly IEnumerable<ICdnApi> _cdnApis;
 		private readonly IConfigService _configService;
 		private readonly IContentTypeService _contentTypeService;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;
+		private readonly IPublishedUrlProvider _urlProvider;
 
-		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService, IUmbracoContextFactory umbracoContextFactory)
+		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService, IUmbracoContextFactory umbracoContextFactory, IPublishedUrlProvider urlProvider)
 		{
 			_cdnApis = cdnApis;
 			_configService = configService;
 			_contentTypeService = contentTypeService;
 			_umbracoContextFactory = umbracoContextFactory;
+			_urlProvider = urlProvider;
 		}
 
 		public async Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content)
@@ -44,7 +45,7 @@ namespace Our.Umbraco.CloudPurge.Services
 			{
 				var urls = from contentItem in filteredContent
 					from culture in contentItem.Cultures
-					select context.UmbracoContext.UrlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key);
+					select _urlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key).ToString();
 
 				if(!urls.Any())
 					return new PurgeResponse(
