@@ -42,10 +42,10 @@ namespace Our.Umbraco.CloudPurge.Models
 				.GroupBy(r => r.Result)
 				.OrderByDescending(g=> g.Key)
 				.FirstOrDefault()
-				.Key;
+				?.Key;
 
 			return new PurgeResponse(
-				result: result,
+				result: result ?? PurgeResult.NothingPurged,
 				failedUrls: responses.SelectMany(r=> r.FailedUrls)
 					.GroupBy(r=> r.Key)
 					.ToDictionary(g=> g.Key, g=> g.SelectMany(r=> r.Value).ToArray()),

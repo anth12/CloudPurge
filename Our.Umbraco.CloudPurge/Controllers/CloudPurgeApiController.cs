@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Models;
 using System.Threading.Tasks;
 using Our.Umbraco.CloudPurge.Services;
@@ -7,36 +6,21 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Web;
 
 namespace Our.Umbraco.CloudPurge.Controllers
 {
 	[PluginController("CloudPurge")]
 	public class CloudPurgeApiController : UmbracoAuthorizedApiController
 	{
-		private readonly IConfigService _configService;
 		private readonly IContentCdnService _cdnService;
-		private readonly IPublishedContentCache _content;
+		private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-		public CloudPurgeApiController(IConfigService configService, IContentCdnService cdnService)
+		public CloudPurgeApiController(IContentCdnService cdnService, IUmbracoContextAccessor umbracoContextAccessor)
 		{
-			_configService = configService;
 			_cdnService = cdnService;
-		}
-
-		[HttpGet]
-		public CloudPurgeConfig Config()
-		{
-			var config = _configService.GetConfig();
-			return config;
-		}
-
-		[HttpPost]
-		public CloudPurgeConfig Config(CloudPurgeConfig config)
-		{
-			_configService.WriteConfig(config);
-			return config;
+			_umbracoContextAccessor = umbracoContextAccessor;
 		}
 
 		[HttpGet]
@@ -47,10 +31,10 @@ namespace Our.Umbraco.CloudPurge.Controllers
 			return result;
 		}
 
-		[HttpGet]
 		public async Task<IActionResult> Purge(int id, bool descendants = false)
 		{
-			var content = _content.GetById(id);
+			
+			var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(id);
 
 			if(content == null)
 				return NotFound($"Content {id} not found");

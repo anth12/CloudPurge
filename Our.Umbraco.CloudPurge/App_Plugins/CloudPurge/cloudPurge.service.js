@@ -48,7 +48,7 @@
 			},
 
 			purgeContent: function (id, descendants) {
-				return $http.get(`backoffice/CloudPurge/CloudPurgeApi/Purge/${id}?descendants=${descendants}`);
+				return $http.get(`backoffice/CloudPurge/CloudPurgeApi/Purge?id=${id}&descendants=${descendants}`);
 			}
 
 		}

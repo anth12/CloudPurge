@@ -7,64 +7,65 @@ using Our.Umbraco.CloudPurge.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Our.Umbraco.CloudPurge.Utilities;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Routing;
+using Microsoft.Extensions.Options;
 
 namespace Our.Umbraco.CloudPurge.Services
 {
     public class ContentCdnService : IContentCdnService
 	{
 		private readonly IEnumerable<ICdnApi> _cdnApis;
-		private readonly IConfigService _configService;
+		private readonly IOptionsMonitor<CloudPurgeConfig> _options;
 		private readonly IContentTypeService _contentTypeService;
-		private readonly IUmbracoContextFactory _umbracoContextFactory;
 		private readonly IPublishedUrlProvider _urlProvider;
 
-		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IConfigService configService, IContentTypeService contentTypeService, IUmbracoContextFactory umbracoContextFactory, IPublishedUrlProvider urlProvider)
+		public ContentCdnService(IEnumerable<ICdnApi> cdnApis, IOptionsMonitor<CloudPurgeConfig> options, IContentTypeService contentTypeService, IPublishedUrlProvider urlProvider)
 		{
 			_cdnApis = cdnApis;
-			_configService = configService;
+			_options = options;
 			_contentTypeService = contentTypeService;
-			_umbracoContextFactory = umbracoContextFactory;
 			_urlProvider = urlProvider;
 		}
 
 		public async Task<PurgeResponse> PurgeAsync(IEnumerable<IPublishedContent> content)
 		{
-			var config = _configService.GetConfig();
+			var config = _options.CurrentValue;
 
 			var publishedContent = content as IPublishedContent[] ?? content.ToArray();
 
 			var contentTypeIds = publishedContent.Select(c => c.ContentType.Id).ToHashSet().ToArray();
 			var contentTypes = _contentTypeService.GetAll(contentTypeIds).ToDictionary(c => c.Id, c => c);
 
-			var filteredContent =
-				publishedContent.Where(c => config.ContentFilter.AllowedContent(contentTypes[c.ContentType.Id]));
-
-			using (var context = _umbracoContextFactory.EnsureUmbracoContext())
+			if (config.ContentFilter != null)
 			{
-				var urls = from contentItem in filteredContent
-					from culture in contentItem.Cultures
-					select _urlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key).ToString();
-
-				if(!urls.Any())
-					return new PurgeResponse(
-						result: PurgeResult.NothingPurged,
-						failedUrls: null,
-						failMessages: null,
-						exception: null);
-
-				var request = new PurgeRequest(urls);
-
-				return await PurgeAsync(request);
+				publishedContent = publishedContent
+					.Where(c => config.ContentFilter.AllowedContent(contentTypes[c.ContentType.Id]))
+					.ToArray();
 			}
+
+			var urls = from contentItem in publishedContent
+						from culture in contentItem.Cultures
+				select _urlProvider.GetUrl(contentItem, UrlMode.Absolute, culture.Key).ToString();
+
+			if(!urls.Any())
+				return new PurgeResponse(
+					result: PurgeResult.NothingPurged,
+					failedUrls: null,
+					failMessages: null,
+					exception: null);
+
+			var request = new PurgeRequest(urls);
+
+			return await PurgeAsync(request);
 		}
 
 		public async Task<PurgeResponse> PurgeAsync(PurgeRequest request)
 		{
 			var maxRequestSize = _cdnApis.Min(c => c.MaxBatchSize);
 
-			var batches = request.Urls.Batch(maxRequestSize, c => new PurgeRequest(c));
+			var batches = request.Urls.Batch(maxRequestSize, c => {
+				return new PurgeRequest(c);
+				});
 
 			var purgeTasks = _cdnApis.Where(c => c.IsEnabled())
 				.SelectMany(cdn => batches.Select(cdn.PurgeByUrlAsync));
