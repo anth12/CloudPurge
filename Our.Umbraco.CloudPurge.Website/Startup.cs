@@ -44,6 +44,7 @@ namespace Our.Umbraco.CloudPurge.Website
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
+                .AddCloudPurge()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 
