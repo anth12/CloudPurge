@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Our.Umbraco.CloudPurge.Cdn;
 using Our.Umbraco.CloudPurge.Cdn.CloudFlare;
@@ -17,25 +18,25 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 	internal class CloudFlareV4Api : ICdnApi
 	{
 		private readonly ILogger<CloudFlareV4Api> _logger;
-		private readonly IConfigService _configService;
+		private readonly IOptionsMonitor<CloudPurgeConfig> _options;
 		private readonly HttpClient _httpClient;
 
 		private const string Endpoint = "https://api.cloudflare.com/client/v4";
 		private const int MaxRequestSize = 30;
 
-		public CloudFlareV4Api(IConfigService configService, HttpClient httpClient, ILogger<CloudFlareV4Api> logger)
+		public CloudFlareV4Api(IOptionsMonitor<CloudPurgeConfig> options, HttpClient httpClient, ILogger<CloudFlareV4Api> logger)
 		{
-			_configService = configService;
+			_options = options;
 			_httpClient = httpClient;
 			_logger = logger;
 		}
 
 		public int MaxBatchSize => MaxRequestSize;
-		public bool IsEnabled() => _configService.GetConfig().CloudFlare.Enabled;
+		public bool IsEnabled() => _options.CurrentValue.CloudFlare.Enabled;
 
 		public async Task<PurgeResponse> PurgeByUrlAsync(PurgeRequest request)
 		{
-			var config = _configService.GetConfig();
+			var config = _options.CurrentValue;
 
 			var apiRequest = new PurgeFilesCacheRequest(request.Urls);
 
@@ -65,7 +66,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 
 		public async Task<PurgeResponse> PurgeAllAsync(PurgeAllRequest request)
 		{
-			var config = _configService.GetConfig();
+			var config = _options.CurrentValue;
 
 			var apiRequest = new PurgeAllCacheRequest(true);
 
@@ -92,7 +93,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 		
 		public async Task<bool> HealthCheckAsync()
 		{
-			var config = _configService.GetConfig();
+			var config = _options.CurrentValue;
 
 			var uri = new Uri($"{Endpoint}/zones/{config.CloudFlare.ZoneId}");
 
@@ -109,7 +110,7 @@ namespace Our.Umbraco.CloudPurge.CDN.CloudFlare
 
 		private async Task<TResponse> FetchAsync<TResponse, TRequest>(Uri uri, HttpMethod method, TRequest request = default)
 		{
-			var config = _configService.GetConfig();
+			var config = _options.CurrentValue;
 
 			var httpRequest = new HttpRequestMessage(method, uri);
 

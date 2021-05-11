@@ -6,29 +6,29 @@ using System.Threading.Tasks;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services.Notifications;
 using Microsoft.Extensions.Logging;
-using Our.Umbraco.CloudPurge.Config;
 using Our.Umbraco.CloudPurge.Services;
 using Umbraco.Cms.Core.Web;
+using Microsoft.Extensions.Options;
+using Our.Umbraco.CloudPurge.Config;
 
 namespace Our.Umbraco.CloudPurge.Events
 {
     internal class ContentUpdateHandler : INotificationAsyncHandler<ContentTreeChangeNotification>
 	{
 		private readonly ILogger<MenuRenderingHandler> _logger;
-		private readonly IConfigService _configService;
 		private readonly IContentCdnService _contentCdnService;
 		private readonly IUmbracoContextFactory _umbracoContextFactory;
+		private readonly IOptionsMonitor<CloudPurgeConfig> _options;
 
-		public ContentUpdateHandler(ILogger<MenuRenderingHandler> logger, IConfigService configService, IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory)
+		public ContentUpdateHandler(ILogger<MenuRenderingHandler> logger, IContentCdnService contentCdnService, IUmbracoContextFactory umbracoContextFactory, IOptionsMonitor<CloudPurgeConfig> _options)
 		{
 			_logger = logger;
-			_configService = configService;
 			_contentCdnService = contentCdnService;
 			_umbracoContextFactory = umbracoContextFactory;
 		}
 
 		private bool PublishHookEnabled()
-			=> _configService.GetConfig().EnablePublishHooks;
+			=> _options.CurrentValue.EnablePublishHooks;
 
 		public Task HandleAsync(ContentSavingNotification notification, CancellationToken cancellationToken)
 		{
