@@ -43,4 +43,6 @@ Use the .NET 10 SDK. Build and test with `dotnet test Our.Umbraco.CloudPurge.Tes
 
 ## Publishing
 
-Add a NuGet.org API key with permission to push `CloudPurge` as the GitHub Actions repository secret `NUGET_API_KEY`. To publish, update `<Version>` in `Our.Umbraco.CloudPurge/Our.Umbraco.CloudPurge.csproj`, then push a matching `v<version>` tag (for example, `v1.0.0-preview1`). The workflow tests against Umbraco 17 and 18, packs the release, and pushes it to NuGet.org. Branch and pull request builds only test and pack locally.
+Configure a [NuGet.org trusted publishing profile](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing) under the `AnthonyHalliday` NuGet.org account for repository owner `anth12`, repository `CloudPurge`, workflow file `main.yml`, and GitHub environment `production`. The `production` GitHub environment must exist. No GitHub repository variable or long-lived NuGet API key is needed.
+
+To publish, update `<Version>` in `Our.Umbraco.CloudPurge/Our.Umbraco.CloudPurge.csproj`, then push a matching `v<version>` tag (for example, `v1.0.0-preview1`). The workflow tests against Umbraco 17 and 18, packs the release, requests a temporary NuGet key through GitHub OIDC, and pushes the package. Branch and pull request builds only test and pack locally.

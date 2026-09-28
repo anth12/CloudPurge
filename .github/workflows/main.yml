@@ -54,7 +54,7 @@ jobs:
         id: login
         uses: NuGet/login@v1
         with:
-          user: ${{ vars.NUGET_USER }}
+          user: AnthonyHalliday
       - name: Publish to NuGet.org
         env:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
