@@ -1,0 +1,13 @@
+<Project>
+  <ItemGroup>
+    <_CloudPurgeAsset Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\App_Plugins\CloudPurge\**\*" />
+    <Content Include="@(_CloudPurgeAsset)">
+      <Link>App_Plugins\CloudPurge\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <Target Name="CopyCloudPurgeAssets" BeforeTargets="Build" Condition="'@(_CloudPurgeAsset)' != ''">
+    <Copy SourceFiles="@(_CloudPurgeAsset)" DestinationFiles="@(_CloudPurgeAsset->'$(MSBuildProjectDirectory)\App_Plugins\CloudPurge\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

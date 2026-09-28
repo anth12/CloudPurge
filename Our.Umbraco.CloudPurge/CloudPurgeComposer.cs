@@ -1,36 +1,30 @@
-﻿using Our.Umbraco.CloudPurge.Config;
-using Our.Umbraco.CloudPurge.Controllers;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using Our.Umbraco.CloudPurge.Cdn;
-using Our.Umbraco.CloudPurge.CDN.CloudFlare;
-using Our.Umbraco.CloudPurge.Services;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Web;
-using Umbraco.Web.Trees;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-[assembly: InternalsVisibleTo("Our.Umbraco.CloudPurge.Tests")]
-namespace Our.Umbraco.CloudPurge
+namespace Our.Umbraco.CloudPurge;
+
+public sealed class CloudPurgeComposer : IComposer
 {
-	public class CloudPurgeComposer : IComposer
-	{
-		public void Compose(Composition composition)
-		{
-			composition.Register<IConfigService, ConfigFileService>(Lifetime.Singleton);
-			composition.Register<ICdnApi, CloudFlareV4Api>(Lifetime.Transient);
-			composition.Register<IContentCdnService, ContentCdnService>(Lifetime.Transient);
-			composition.Register<CloudPurgeApiController>(Lifetime.Transient);
-			
-			composition.Register<HttpClient>(Lifetime.Singleton);
-			
-			composition.Components().Append<CloudPurgeComponent>();
-			composition.Dashboards().Add<CloudPurgeDashboard>();
+    public void Compose(IUmbracoBuilder builder)
+    {
+        builder.Services.AddOptions<CloudPurgeOptions>()
+            .BindConfiguration(CloudPurgeOptions.SectionName)
+            .Validate(options => !string.IsNullOrWhiteSpace(options.Cloudflare.ApiToken)
+                && !string.IsNullOrWhiteSpace(options.Cloudflare.ZoneId),
+                "CloudPurge requires CloudPurge:Cloudflare:ApiToken and CloudPurge:Cloudflare:ZoneId.")
+            .ValidateOnStart();
 
-			// ReSharper disable once AccessToStaticMemberViaDerivedType
-			ContentTreeController.MenuRendering += CloudPurgeAction.ContentTreeController_MenuRendering;
-		}
-
-	}
+        builder.Services.AddHttpClient<CloudflareClient>();
+        builder.Services.AddTransient<CloudPurgeService>();
+        builder.AddNotificationAsyncHandler<ContentPublishingNotification, ContentPublishingHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, ContentPublishedHandler>();
+        builder.AddNotificationAsyncHandler<ContentUnpublishingNotification, ContentUnpublishingHandler>();
+        builder.AddNotificationAsyncHandler<ContentUnpublishedNotification, ContentUnpublishedHandler>();
+        builder.AddNotificationAsyncHandler<ContentMovingNotification, ContentMovingHandler>();
+        builder.AddNotificationAsyncHandler<ContentMovedNotification, ContentMovedHandler>();
+        builder.AddNotificationAsyncHandler<ContentMovingToRecycleBinNotification, ContentMovingToRecycleBinHandler>();
+        builder.AddNotificationAsyncHandler<ContentMovedToRecycleBinNotification, ContentMovedToRecycleBinHandler>();
+    }
 }
