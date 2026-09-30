@@ -39,10 +39,20 @@ Version 1 is a replacement package for Umbraco 17+. The XML `Config/CloudPurge.c
 
 ## Development
 
-Use the .NET 10 SDK. Build and test with `dotnet test Our.Umbraco.CloudPurge.Tests/Our.Umbraco.CloudPurge.Tests.csproj`. To check a newer Umbraco version, pass `-p:UmbracoVersion=18.1.1` to restore, build, and test. The minimum referenced version is 17.0.2; CI checks current Umbraco 17 and 18 releases.
+Use the .NET 10 SDK and Node.js 22. Build the backoffice client before building, testing, or packing the .NET project:
+
+```powershell
+cd Our.Umbraco.CloudPurge/Client
+npm ci
+npm run build
+cd ../..
+dotnet test Our.Umbraco.CloudPurge.Tests/Our.Umbraco.CloudPurge.Tests.csproj
+```
+
+The Vite build writes the package manifest and JavaScript to `Our.Umbraco.CloudPurge/wwwroot/App_Plugins/CloudPurge`. During frontend development, run `npm run watch` from the `Client` directory. The Razor class library packs the generated static web assets; there are no custom MSBuild copy targets. To check a newer Umbraco version, pass `-p:UmbracoVersion=18.1.1` to restore, build, and test. The minimum referenced version is 17.0.2; CI checks current Umbraco 17 and 18 releases.
 
 ## Publishing
 
 Configure a [NuGet.org trusted publishing profile](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing) under the `AnthonyHalliday` NuGet.org account for repository owner `anth12`, repository `CloudPurge`, workflow file `main.yml`, and GitHub environment `production`. The `production` GitHub environment must exist. No GitHub repository variable or long-lived NuGet API key is needed.
 
-To publish, update `<Version>` in `Our.Umbraco.CloudPurge/Our.Umbraco.CloudPurge.csproj`, then push a matching `v<version>` tag (for example, `v1.0.0-preview1`). The workflow tests against Umbraco 17 and 18, packs the release, requests a temporary NuGet key through GitHub OIDC, and pushes the package. Branch and pull request builds only test and pack locally.
+To publish, update `<Version>` in `Our.Umbraco.CloudPurge/Our.Umbraco.CloudPurge.csproj`, then push a matching `v<version>` tag (for example, `v1.0.0-preview1`). The workflow builds the frontend, tests against Umbraco 17 and 18, packs the release, requests a temporary NuGet key through GitHub OIDC, and pushes the package. Branch and pull request builds only test and pack locally.
