@@ -1,7 +1,0 @@
-{
-  javascript:  
-  [
-    "~/App_Plugins/CloudPurge/cloudPurge.service.js",
-    "~/App_Plugins/CloudPurge/cloudPurge.controller.js"
-  ]
-}

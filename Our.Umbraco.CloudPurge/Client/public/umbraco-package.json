@@ -1,0 +1,13 @@
+{
+  "id": "CloudPurge",
+  "name": "CloudPurge",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "name": "Cloud Purge Bundle",
+      "alias": "CloudPurge.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/CloudPurge/cloud-purge.js"
+    }
+  ]
+}

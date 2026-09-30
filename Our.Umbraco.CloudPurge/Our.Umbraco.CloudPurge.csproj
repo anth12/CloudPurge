@@ -1,65 +1,32 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
     <PackageId>CloudPurge</PackageId>
-	<Title>CloudPurge for Umbraco</Title>
-	<Authors>Anthony Halliday</Authors>
-    <Version>0.0.7</Version>
-    <PackageTags>Umbraco,Cache,PurgeCache,Cach,Cloudflare</PackageTags>	
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-	<summary>CloudPurge: Purge CDN cache from Umbraco</summary>
-	<description>Umbraco backoffice extension to clear CDN cache on content saving events. CloudPurge also adds a context menu action to the Content tree allowing cache to be purged by pages on demand.</description>
-	<PackageReleaseNotes>
-    v0.0.7    - Removed empty requets when content is filtered
-    v0.0.6    - .net standard csproj migration
-    v0.0.5    - Backoffice Content Type picker
-    v0.0.4    - PublishHookEnabled switch
-    v0.0.3    - Verbose logging
-    v0.0.2    - Target Umbraco 8.5.5
-    v0.0.1    - Initial release
-  </PackageReleaseNotes>
-	<RepositoryUrl>https://github.com/anth12/CloudPurge</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
-	<IsPackable>true</IsPackable>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <PackageIcon>logo.png</PackageIcon>
+    <Version>1.0.0</Version>
+    <Title>CloudPurge for Umbraco</Title>
+    <Authors>Anthony Halliday</Authors>
+    <Description>Purges Cloudflare cache when Umbraco content changes, with an editor action for manual purging.</Description>
+    <PackageTags>Umbraco;Cloudflare;Cache</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/anth12/CloudPurge</PackageProjectUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/anth12/CloudPurge</RepositoryUrl>
+    <UmbracoVersion Condition="'$(UmbracoVersion)' == ''">17.0.2</UmbracoVersion>
   </PropertyGroup>
-
   <ItemGroup>
-	  
-	  <Content Include="..\Our.Umbraco.CloudPurge.Website\App_Plugins\**\*">
-	    <Pack>true</Pack>
-	    <PackagePath>content\App_Plugins\</PackagePath>
-	    <PackageCopyToOutput>true</PackageCopyToOutput>
-	  </Content>
-
-    <Content Include="Config/CloudPurge.config">
-      <Pack>true</Pack>
-      <PackagePath>content\Config\</PackagePath>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-    </Content>
-    
+    <PackageReference Include="Umbraco.Cms" Version="$(UmbracoVersion)" />
   </ItemGroup>
-  
   <ItemGroup>
-    <PackageReference Include="UmbracoCms.Core" Version="8.5.5" />
-    <PackageReference Include="UmbracoCms.Web" Version="8.5.5" />
+    <InternalsVisibleTo Include="Our.Umbraco.CloudPurge.Tests" />
   </ItemGroup>
-  
   <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\logo.png" Pack="true" PackagePath="" />
+    <None Include="..\readme.md" Pack="true" PackagePath="README.md" />
+    <Content Remove="Client\**" />
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
   </ItemGroup>
-  
 </Project>

@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.CloudPurge", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.CloudPurge.Tests", "Our.Umbraco.CloudPurge.Tests\Our.Umbraco.CloudPurge.Tests.csproj", "{A37D5AD2-6718-415B-8DF7-8789EC44CFF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.Umbraco.CloudPurge.Website", "Our.Umbraco.CloudPurge.Website\Our.Umbraco.CloudPurge.Website.csproj", "{9C242E9C-8971-4CBD-B4F3-3443D806876C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{A37D5AD2-6718-415B-8DF7-8789EC44CFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A37D5AD2-6718-415B-8DF7-8789EC44CFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A37D5AD2-6718-415B-8DF7-8789EC44CFF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9C242E9C-8971-4CBD-B4F3-3443D806876C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9C242E9C-8971-4CBD-B4F3-3443D806876C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9C242E9C-8971-4CBD-B4F3-3443D806876C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9C242E9C-8971-4CBD-B4F3-3443D806876C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
