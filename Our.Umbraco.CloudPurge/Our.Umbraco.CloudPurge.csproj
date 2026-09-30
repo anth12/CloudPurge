@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <PackageId>CloudPurge</PackageId>
-    <Version>1.0.0-preview2</Version>
+    <Version>1.0.0-preview3</Version>
     <Title>CloudPurge for Umbraco</Title>
     <Authors>Anthony Halliday</Authors>
     <Description>Purges Cloudflare cache when Umbraco content changes, with an editor action for manual purging.</Description>
