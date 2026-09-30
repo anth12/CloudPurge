@@ -1,4 +1,6 @@
 using System.Net;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Our.Umbraco.CloudPurge;
@@ -31,11 +33,41 @@ public sealed class CloudflareClientTests
     [Test]
     public void PurgeRejectsCloudflareFailure()
     {
+        var logger = new RecordingLogger();
         using var http = new HttpClient(new Handler(_ => Task.FromResult(
-            new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{\"success\":false}") })));
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{\"success\":false,\"errors\":[{\"code\":1003,\"message\":\"Invalid URL\"}]}")
+            })));
 
-        Assert.ThrowsAsync<HttpRequestException>(async () =>
-            await CreateClient(http).PurgeAsync(new[] { "https://example.com/a" }));
+        var exception = Assert.ThrowsAsync<HttpRequestException>(async () =>
+            await CreateClient(http, logger).PurgeAsync(new[] { "https://example.com/a", "https://example.com/b" }));
+
+        Assert.That(exception!.Message, Does.Contain("1003: Invalid URL"));
+        Assert.That(logger.Messages, Has.Count.EqualTo(1));
+        Assert.That(logger.Messages[0], Does.Contain("https://example.com/a"));
+        Assert.That(logger.Messages[0], Does.Contain("https://example.com/b"));
+        Assert.That(logger.Messages[0], Does.Contain("1003: Invalid URL"));
+    }
+
+    [Test]
+    public void PurgeLogsHttpFailureWithUrlsAndCloudflareReason()
+    {
+        var logger = new RecordingLogger();
+        using var http = new HttpClient(new Handler(_ => Task.FromResult(
+            new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent("{\"success\":false,\"errors\":[{\"code\":1000,\"message\":\"Invalid zone\"}]}")
+            })));
+
+        var exception = Assert.ThrowsAsync<HttpRequestException>(async () =>
+            await CreateClient(http, logger).PurgeAsync(new[] { "https://example.com/a" }));
+
+        Assert.That(exception!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(logger.Messages, Has.Count.EqualTo(1));
+        Assert.That(logger.Messages[0], Does.Contain("https://example.com/a"));
+        Assert.That(logger.Messages[0], Does.Contain("HTTP 400"));
+        Assert.That(logger.Messages[0], Does.Contain("1000: Invalid zone"));
     }
 
     [Test]
@@ -78,8 +110,25 @@ public sealed class CloudflareClientTests
         Assert.That(calls, Is.EqualTo(2));
     }
 
-    private static CloudflareClient CreateClient(HttpClient http) => new(http,
-        Options.Create(new CloudPurgeOptions { Cloudflare = new CloudflareOptions { ApiToken = "secret", ZoneId = "zone" } }));
+    private static CloudflareClient CreateClient(HttpClient http, ILogger<CloudflareClient>? logger = null) => new(http,
+        Options.Create(new CloudPurgeOptions { Cloudflare = new CloudflareOptions { ApiToken = "secret", ZoneId = "zone" } }),
+        logger ?? NullLogger<CloudflareClient>.Instance);
+
+    private sealed class RecordingLogger : ILogger<CloudflareClient>
+    {
+        public List<string> Messages { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            if (logLevel == LogLevel.Error)
+                Messages.Add(formatter(state, exception));
+        }
+    }
 
     private sealed class Handler(Func<HttpRequestMessage, Task<HttpResponseMessage>> handle) : HttpMessageHandler
     {
