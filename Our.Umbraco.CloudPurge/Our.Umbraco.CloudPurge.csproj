@@ -19,6 +19,9 @@
     <PackageReference Include="Umbraco.Cms" Version="$(UmbracoVersion)" />
   </ItemGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Our.Umbraco.CloudPurge.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\logo.png" Pack="true" PackagePath="" />
     <None Include="..\readme.md" Pack="true" PackagePath="README.md" />

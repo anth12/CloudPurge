@@ -5,11 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <RuntimeUmbracoVersion Condition="'$(RuntimeUmbracoVersion)' == '' and '$(UmbracoVersion)' != ''">$(UmbracoVersion)</RuntimeUmbracoVersion>
+    <RuntimeUmbracoVersion Condition="'$(RuntimeUmbracoVersion)' == ''">17.0.2</RuntimeUmbracoVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="NUnit" Version="4.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.1.0" />
+    <PackageReference Include="Umbraco.Cms" Version="$(RuntimeUmbracoVersion)" />
     <ProjectReference Include="..\Our.Umbraco.CloudPurge\Our.Umbraco.CloudPurge.csproj" />
   </ItemGroup>
 </Project>

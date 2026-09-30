@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
@@ -14,6 +15,7 @@ namespace Our.Umbraco.CloudPurge;
 [Authorize(Policy = global::Umbraco.Cms.Web.Common.Authorization.AuthorizationPolicies.BackOfficeAccess)]
 public sealed class CloudPurgeController(
     IContentService contentService,
+    IIdKeyMap idKeyMap,
     IContentPermissionService permissions,
     IBackOfficeSecurityAccessor securityAccessor,
     CloudPurgeService purger,
@@ -26,8 +28,8 @@ public sealed class CloudPurgeController(
         if (user is null)
             return Unauthorized();
 
-        var content = contentService.GetById(key);
-        if (content is null)
+        var contentId = idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
+        if (!contentId.Success || contentService.GetById(contentId.Result) is null)
             return NotFound();
 
         var permission = await permissions.AuthorizeAccessAsync(user, key, ActionPublish.ActionLetter);
@@ -40,7 +42,7 @@ public sealed class CloudPurgeController(
 
         try
         {
-            var count = await purger.PurgeAsync(new[] { content.Id }, descendants, cancellationToken);
+            var count = await purger.PurgeAsync(new[] { contentId.Result }, descendants, cancellationToken);
             return Ok(new { purgedUrls = count });
         }
         catch (Exception exception) when (!cancellationToken.IsCancellationRequested)

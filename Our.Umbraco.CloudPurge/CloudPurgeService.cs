@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
 namespace Our.Umbraco.CloudPurge;
 
@@ -12,6 +12,13 @@ public sealed class CloudPurgeService(
     IOptions<CloudPurgeOptions> options,
     ILogger<CloudPurgeService> logger)
 {
+    // Umbraco 18 moved Cultures from IPublishedContent to IPublishedElement.
+    // Resolve the getter at runtime so one package works with both versions.
+    private static readonly PropertyInfo CulturesProperty =
+        typeof(IPublishedContent).GetProperty("Cultures")
+        ?? typeof(IPublishedElement).GetProperty("Cultures")
+        ?? throw new NotSupportedException("The installed Umbraco version does not expose published cultures.");
+
     public async Task<int> PurgeAsync(IEnumerable<int> contentIds, bool descendants, CancellationToken cancellationToken = default)
     {
         return await PurgeUrlsAsync(GetUrls(contentIds, descendants), cancellationToken);
@@ -48,12 +55,17 @@ public sealed class CloudPurgeService(
 
     private static IEnumerable<string> GetUrls(IPublishedContent item)
     {
-        var cultures = item.Cultures.Count == 0 ? new string?[] { null } : item.Cultures.Keys.Cast<string?>();
-        foreach (var culture in cultures)
+        foreach (var culture in GetCultures(item))
         {
             var url = item.Url(culture: culture, mode: UrlMode.Absolute);
             if (Uri.TryCreate(url, UriKind.Absolute, out _))
                 yield return url;
         }
+    }
+
+    internal static IEnumerable<string?> GetCultures(IPublishedContent item)
+    {
+        var cultures = (IReadOnlyDictionary<string, PublishedCultureInfo>)CulturesProperty.GetValue(item)!;
+        return cultures.Count == 0 ? [null] : cultures.Keys.Cast<string?>();
     }
 }
