@@ -25,7 +25,7 @@
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\logo.png" Pack="true" PackagePath="" />
     <None Include="..\readme.md" Pack="true" PackagePath="README.md" />
-    <None Include="App_Plugins\CloudPurge\**\*" Pack="true" PackagePath="contentFiles\any\any\App_Plugins\CloudPurge\" />
+    <None Include="App_Plugins\CloudPurge\**\*" Pack="true" PackagePath="buildTransitive\assets\App_Plugins\CloudPurge\" />
     <None Include="buildTransitive\CloudPurge.targets" Pack="true" PackagePath="buildTransitive\CloudPurge.targets" />
   </ItemGroup>
 </Project>

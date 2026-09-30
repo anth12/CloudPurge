@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <_CloudPurgeAsset Include="$(MSBuildThisFileDirectory)..\contentFiles\any\any\App_Plugins\CloudPurge\**\*" />
+    <_CloudPurgeAsset Include="$(MSBuildThisFileDirectory)assets\App_Plugins\CloudPurge\**\*" />
     <Content Include="@(_CloudPurgeAsset)">
       <Link>App_Plugins\CloudPurge\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

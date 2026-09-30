@@ -26,6 +26,9 @@ jobs:
       - run: dotnet restore Our.Umbraco.CloudPurge.Tests/Our.Umbraco.CloudPurge.Tests.csproj -p:UmbracoVersion=${{ matrix.umbraco }}
       - run: dotnet test Our.Umbraco.CloudPurge.Tests/Our.Umbraco.CloudPurge.Tests.csproj --no-restore -p:UmbracoVersion=${{ matrix.umbraco }}
       - run: dotnet pack Our.Umbraco.CloudPurge/Our.Umbraco.CloudPurge.csproj --no-restore -p:UmbracoVersion=${{ matrix.umbraco }}
+      - name: Test Umbraco 17 package on Umbraco 18
+        if: matrix.umbraco == '18.1.1'
+        run: dotnet test Our.Umbraco.CloudPurge.Tests/Our.Umbraco.CloudPurge.Tests.csproj -p:UmbracoVersion=17.0.2 -p:RuntimeUmbracoVersion=18.1.1
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
